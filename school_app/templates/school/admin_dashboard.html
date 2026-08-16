@@ -1,0 +1,106 @@
+{% extends 'school/base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block nav_admin_dash %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Admin Dashboard</h1>
+    <p>Welcome back, {{ request.user.get_full_name }}. Here's what's happening in your school.</p>
+  </div>
+  <div class="actions">
+    <a href="{% url 'school_app:register_teacher' %}" class="btn btn-primary">+ Add Teacher</a>
+    <a href="{% url 'school_app:register_student' %}" class="btn btn-success">+ Add Student</a>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-icon navy">👨‍🏫</div>
+    <div class="stat-value">{{ teachers_count|default:"—" }}</div>
+    <div class="stat-label">Total Teachers</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green">🎒</div>
+    <div class="stat-value">{{ students_count|default:"—" }}</div>
+    <div class="stat-label">Total Students</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange">🏫</div>
+    <div class="stat-value">{{ class_arms_count|default:"—" }}</div>
+    <div class="stat-label">Class Arms</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon purple">📚</div>
+    <div class="stat-value">{{ subjects_count|default:"—" }}</div>
+    <div class="stat-label">Subjects</div>
+  </div>
+</div>
+
+<!-- Quick actions grid -->
+<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap:20px;">
+
+  <!-- People -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">👨‍🏫 People</span>
+    </div>
+    <div class="card-body" style="display:flex; flex-direction:column; gap:10px; padding:16px 20px;">
+      <a href="{% url 'school_app:register_teacher' %}" class="btn btn-outline" style="justify-content:flex-start;">➕ Register Teacher</a>
+      <a href="{% url 'school_app:register_student' %}" class="btn btn-outline" style="justify-content:flex-start;">➕ Register Student</a>
+      <a href="{% url 'school_app:view_teachers' %}" class="btn btn-outline" style="justify-content:flex-start;">📋 View All Teachers</a>
+      <a href="{% url 'school_app:view_students' %}" class="btn btn-outline" style="justify-content:flex-start;">📋 View All Students</a>
+    </div>
+  </div>
+
+  <!-- Classes -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">🏫 Class Arms</span>
+    </div>
+    <div class="card-body" style="display:flex; flex-direction:column; gap:10px; padding:16px 20px;">
+      <a href="{% url 'school_app:create_class_arm' %}" class="btn btn-outline" style="justify-content:flex-start;">➕ Create Class Arm</a>
+      <a href="{% url 'school_app:view_all_class_arms' %}" class="btn btn-outline" style="justify-content:flex-start;">📋 View All Classes</a>
+      <a href="{% url 'school_app:assign_teacher_class' %}" class="btn btn-outline" style="justify-content:flex-start;">🔗 Assign Teacher to Class</a>
+      <a href="{% url 'school_app:assign_student_class' %}" class="btn btn-outline" style="justify-content:flex-start;">🔗 Assign Student to Class</a>
+    </div>
+  </div>
+
+  <!-- Subjects -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">📚 Subjects</span>
+    </div>
+    <div class="card-body" style="display:flex; flex-direction:column; gap:10px; padding:16px 20px;">
+      <a href="{% url 'school_app:register_subjects' %}" class="btn btn-outline" style="justify-content:flex-start;">➕ Register Subject</a>
+      <a href="{% url 'school_app:view_all_subjects' %}" class="btn btn-outline" style="justify-content:flex-start;">📋 View All Subjects</a>
+      <a href="{% url 'school_app:assign_class_subject' %}" class="btn btn-outline" style="justify-content:flex-start;">🔗 Assign Subjects to Class</a>
+    </div>
+  </div>
+
+  <!-- My Account -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">👤 My Account</span>
+    </div>
+    <div class="card-body" style="display:flex; flex-direction:column; gap:10px; padding:16px 20px;">
+      <a href="{% url 'school_app:admin_profile' %}" class="btn btn-outline" style="justify-content:flex-start;">👤 View Profile</a>
+      <a href="{% url 'school_app:edit_admin_profile' %}" class="btn btn-outline" style="justify-content:flex-start;">✏️ Edit Profile</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- Results -->
+<div class="card" style="margin-top:20px;">
+  <div class="card-header">
+    <span class="card-title">📊 Results{% if current_term %} — <span style="font-weight:400; color:var(--muted); font-size:13px;">{{ current_term }}</span>{% endif %}</span>
+  </div>
+  <div class="card-body" style="display:flex; flex-direction:column; gap:10px; padding:16px 20px;">
+    <a href="{% url 'school_app:admin_view_results' %}" class="btn btn-primary" style="justify-content:flex-start;">📊 View Academic Results by Class</a>
+    <a href="{% url 'school_app:start_new_term' %}" class="btn btn-outline" style="justify-content:flex-start;">🗓️ Start New Term</a>
+  </div>
+</div>
+{% endblock %}

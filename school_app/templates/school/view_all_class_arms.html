@@ -1,0 +1,62 @@
+{% extends 'school/base.html' %}
+{% block title %}Class Arms{% endblock %}
+{% block page_title %}Class Arms{% endblock %}
+{% block nav_classes %}active{% endblock %}
+{% block breadcrumb %}<span>/</span> Class Arms{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Class Arms</h1>
+    <p>{{ class_arms.count }} class arm{{ class_arms.count|pluralize }} configured</p>
+  </div>
+  {% if request.user.is_superuser %}
+  <a href="{% url 'school_app:create_class_arm' %}" class="btn btn-primary">+ Create Class Arm</a>
+  {% endif %}
+</div>
+
+{% if class_arms %}
+<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px;">
+  {% for arm in class_arms %}
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">🏫 {{ arm.name }}</span>
+      <span class="badge badge-navy">{{ arm.students.count }} student{{ arm.students.count|pluralize }}</span>
+    </div>
+    <div class="card-body" style="padding:16px 20px; display:flex; flex-direction:column; gap:8px;">
+      <div style="font-size:13px; color:var(--muted);">
+        Teacher:
+        {% with teacher=arm.teacherprofile_set.first %}
+          {% if teacher %}<strong style="color:var(--text);">{{ teacher.user.get_full_name }}</strong>
+          {% else %}<span style="color:#E53E3E;">No teacher assigned</span>{% endif %}
+        {% endwith %}
+      </div>
+      <div style="font-size:13px; color:var(--muted);">Subjects: <strong style="color:var(--text);">{{ arm.subjects.count }}</strong></div>
+      <hr style="margin:4px 0;" />
+      <div class="actions" style="flex-wrap:wrap;">
+        <a href="{% url 'school_app:view_classarm' arm.id %}" class="btn btn-outline btn-sm">View Details</a>
+        {% if request.user.is_superuser %}
+        <a href="{% url 'school_app:assign_class_subject' %}" class="btn btn-outline btn-sm">Subjects</a>
+        <form method="post" action="{% url 'school_app:delete_class_arm' arm.id %}" style="display:inline;" onsubmit="return confirm('Delete {{ arm.name }}? This cannot be undone.')">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card">
+  <div class="empty-state">
+    <div class="empty-icon">🏫</div>
+    <h3>No class arms yet</h3>
+    <p>Create your first class arm to start organizing students.</p>
+    {% if request.user.is_superuser %}
+    <a href="{% url 'school_app:create_class_arm' %}" class="btn btn-primary" style="margin-top:16px;">+ Create Class Arm</a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

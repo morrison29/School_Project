@@ -1,0 +1,45 @@
+{% extends 'school/base.html' %}
+{% block title %}Subjects{% endblock %}
+{% block page_title %}Subjects{% endblock %}
+{% block nav_subjects %}active{% endblock %}
+{% block breadcrumb %}<span>/</span> Subjects{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Subjects</h1>
+    <p>{{ subjects.count }} subject{{ subjects.count|pluralize }} registered</p>
+  </div>
+  {% if request.user.is_superuser %}
+  <a href="{% url 'school_app:register_subjects' %}" class="btn btn-primary">+ Add Subject</a>
+  {% endif %}
+</div>
+
+<div class="card">
+  {% if subjects %}
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>#</th><th>Subject Name</th>{% if request.user.is_superuser %}<th>Actions</th>{% endif %}</tr></thead>
+      <tbody>
+        {% for subject in subjects %}
+        <tr>
+          <td style="color:var(--muted);">{{ forloop.counter }}</td>
+          <td><strong>{{ subject.subject_name }}</strong></td>
+          {% if request.user.is_superuser %}
+          <td>
+            <form method="post" action="{% url 'school_app:delete_subject' subject.id %}" style="display:inline;" onsubmit="return confirm('Delete {{ subject.subject_name }}?')">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+            </form>
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><div class="empty-icon">📚</div><h3>No subjects yet</h3>{% if request.user.is_superuser %}<a href="{% url 'school_app:register_subjects' %}" class="btn btn-primary" style="margin-top:16px;">+ Add Subject</a>{% endif %}</div>
+  {% endif %}
+</div>
+{% endblock %}

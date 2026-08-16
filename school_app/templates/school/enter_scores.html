@@ -1,0 +1,62 @@
+{% extends 'school/base.html' %}
+{% block title %}Enter Scores — {{ class_arm.name }}{% endblock %}
+{% block page_title %}Enter Scores{% endblock %}
+{% block nav_teacher_dash %}active{% endblock %}
+{% block breadcrumb %}<span>/</span> {{ class_arm.name }} <span>/</span> Enter Scores{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>📊 Enter Scores — {{ class_arm.name }}</h1>
+    <p>Click a student to enter or update their subject scores.</p>
+  </div>
+  <a href="{% url 'school_app:teacher-dashboard' %}" class="btn btn-outline">← Dashboard</a>
+</div>
+
+<div class="card">
+  {% if students %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Student Name</th>
+          <th>Reg. Number</th>
+          <th>Scores Entered</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for student in students %}
+        <tr>
+          <td style="color:var(--muted);">{{ forloop.counter }}</td>
+          <td><strong>{{ student.user.get_full_name }}</strong></td>
+          <td>{{ student.registration_number|default:"—" }}</td>
+          <td>
+            {% with count=student.result_set.count %}
+              {% if count > 0 %}
+                <span class="badge badge-success">{{ count }} subject{{ count|pluralize }}</span>
+              {% else %}
+                <span class="badge badge-muted">Not entered</span>
+              {% endif %}
+            {% endwith %}
+          </td>
+          <td>
+            <a href="{% url 'school_app:enter_student_scores' student.id %}" class="btn btn-primary btn-sm">
+              ✏️ Enter Scores
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">🎒</div>
+    <h3>No students in this class</h3>
+    <p>Assign students to {{ class_arm.name }} before entering scores.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

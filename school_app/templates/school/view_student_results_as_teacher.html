@@ -1,0 +1,87 @@
+{% extends 'school/base.html' %}
+{% block title %}Student Results{% endblock %}
+{% block page_title %}Academic Results{% endblock %}
+{% block nav_teacher_dash %}active{% endblock %}
+{% block breadcrumb %}<span>/</span> Results <span>/</span> {{ student.user.get_full_name }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>📊 {{ student.user.get_full_name }}</h1>
+    <p>
+      {% if student.registration_number %}
+        Reg No: {{ student.registration_number }}
+        {% if student.class_arm %} &middot; {{ student.class_arm.name }}{% endif %}
+      {% elif student.class_arm %}
+        {{ student.class_arm.name }}
+      {% else %}
+        Full academic result sheet
+      {% endif %}
+    </p>
+  </div>
+  <a href="{% url 'school_app:teacher-dashboard' %}" class="btn btn-outline">← Dashboard</a>
+</div>
+
+{% if all_terms %}
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-body" style="padding:12px 20px;">
+    <form method="get" style="display:flex; align-items:center; gap:10px;">
+      <label for="term" style="font-size:13px; font-weight:600; white-space:nowrap;">Viewing:</label>
+      <select id="term" name="term" class="form-control" onchange="this.form.submit()" style="max-width:260px;">
+        {% for t in all_terms %}
+        <option value="{{ t.id }}" {% if selected_term and selected_term.id == t.id %}selected{% endif %}>{{ t }}</option>
+        {% endfor %}
+      </select>
+    </form>
+  </div>
+</div>
+{% endif %}
+
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">Result Sheet</span>
+  </div>
+
+  {% if results %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th style="text-align:center;">Test</th>
+          <th style="text-align:center;">Assignment</th>
+          <th style="text-align:center;">Exam</th>
+          <th style="text-align:center;">Total</th>
+          <th style="text-align:center;">Grade</th>
+          <th style="text-align:center;">Position</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for result in results %}
+        <tr>
+          <td><strong>{{ result.subject.subject_name }}</strong></td>
+          <td style="text-align:center;">{{ result.test_score }}</td>
+          <td style="text-align:center;">{{ result.assignment_score }}</td>
+          <td style="text-align:center;">{{ result.exam_score }}</td>
+          <td style="text-align:center;"><strong>{{ result.total_score }}</strong></td>
+          <td style="text-align:center;">
+            <span class="grade-{{ result.grade }}">{{ result.grade }}</span>
+          </td>
+          <td style="text-align:center;">
+            {% if result.position == 1 %}🥇{% elif result.position == 2 %}🥈{% elif result.position == 3 %}🥉{% endif %}
+            {{ result.position }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📭</div>
+    <h3>No results yet</h3>
+    <p>No scores have been entered for {{ student.user.get_full_name }}.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'school/base.html' %}
+{% load group_tags %}
+{% block title %}Assignment Detail{% endblock %}
+{% block page_title %}Assignment Detail{% endblock %}
+{% block nav_assignments %}active{% endblock %}
+{% block breadcrumb %}<span>/</span> Assignments <span>/</span> Detail{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>📝 {{ assignment.subject.subject_name }} — Assignment</h1>
+    <p>{{ assignment.class_arm.name }} &nbsp;·&nbsp; Due: <strong>{{ assignment.due_date }}</strong></p>
+  </div>
+  <a href="{% url 'school_app:view_midterm_assignment' assignment.class_arm.id %}" class="btn btn-outline">← Back to Assignments</a>
+</div>
+
+<div class="card" style="max-width:720px;">
+  <div class="card-header">
+    <span class="card-title">{{ assignment.subject.subject_name }}</span>
+    <span class="badge badge-navy">Due: {{ assignment.due_date }}</span>
+  </div>
+  <div class="card-body">
+    <div style="font-size:14px; line-height:1.8; white-space:pre-wrap; color:var(--text);">{{ assignment.description }}</div>
+
+    {% if request.user|has_group:"Teachers" %}
+    <hr />
+    <form method="post" action="{% url 'school_app:delete_midterm_assignment' assignment.id %}" onsubmit="return confirm('Delete this assignment?')">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger btn-sm">🗑 Delete Assignment</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

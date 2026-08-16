@@ -1,0 +1,41 @@
+{% extends 'school/base.html' %}
+{% block title %}My Profile{% endblock %}
+{% block page_title %}Profile{% endblock %}
+{% block nav_admin_dash %}active{% endblock %}
+{% block breadcrumb %}<span>/</span> My Profile{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>👤 My Profile</h1>
+    <p>Your admin account details.</p>
+  </div>
+  <a href="{% url 'school_app:edit_admin_profile' %}" class="btn btn-primary">✏️ Edit Profile</a>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">Account Details</span>
+  </div>
+  <div class="card-body" style="padding:24px 20px;">
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:20px;">
+      <div>
+        <div style="font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Name</div>
+        <div style="font-size:15px; font-weight:700;">{{ user_obj.first_name }} {{ user_obj.last_name }}</div>
+      </div>
+      <div>
+        <div style="font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Username</div>
+        <div style="font-size:15px; font-weight:700;">{{ user_obj.username }}</div>
+      </div>
+      <div>
+        <div style="font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Email</div>
+        <div style="font-size:15px; font-weight:700;">{{ user_obj.email|default:"—" }}</div>
+      </div>
+      <div>
+        <div style="font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Date Joined</div>
+        <div style="font-size:15px; font-weight:700;">{{ user_obj.date_joined|date:"M d, Y" }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

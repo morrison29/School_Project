@@ -1,0 +1,127 @@
+{% extends 'school/base.html' %}
+{% block title %}View Results{% endblock %}
+{% block page_title %}Academic Results{% endblock %}
+{% block nav_admin_dash %}active{% endblock %}
+{% block breadcrumb %}<span>/</span> Results{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>📊 Academic Results</h1>
+    <p>Select a class arm and term to view all student results.</p>
+  </div>
+  <a href="{% url 'school_app:admin-dashboard' %}" class="btn btn-outline">← Dashboard</a>
+</div>
+
+<!-- Filters -->
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-body" style="padding:16px 20px;">
+    <form method="get" style="display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap;">
+      <div class="form-group" style="margin:0; flex:1; min-width:200px;">
+        <label for="class_arm" style="margin-bottom:6px; display:block; font-size:13px; font-weight:600;">Select Class Arm</label>
+        <select id="class_arm" name="class_arm" class="form-control">
+          <option value="">— Choose a class arm —</option>
+          {% for arm in class_arms %}
+          <option value="{{ arm.id }}" {% if selected_arm and selected_arm.id == arm.id %}selected{% endif %}>
+            {{ arm.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group" style="margin:0; flex:1; min-width:200px;">
+        <label for="term" style="margin-bottom:6px; display:block; font-size:13px; font-weight:600;">Term</label>
+        <select id="term" name="term" class="form-control">
+          {% for t in terms %}
+          <option value="{{ t.id }}" {% if selected_term and selected_term.id == t.id %}selected{% endif %}>{{ t }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary" style="white-space:nowrap;">View Results</button>
+      {% if selected_arm %}
+      <a href="{% url 'school_app:admin_view_results' %}" class="btn btn-outline">Clear</a>
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+{% if selected_arm %}
+  {% if student_results_map %}
+    {% for student, results in student_results_map %}
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-header">
+        <div>
+          <span class="card-title">{{ student.user.get_full_name }}</span>
+          {% if student.registration_number %}
+          <span class="badge badge-muted" style="margin-left:8px;">{{ student.registration_number }}</span>
+          {% endif %}
+        </div>
+        <a href="{% url 'school_app:admin_view_student_results' student.id %}" class="btn btn-outline btn-sm">Full View</a>
+      </div>
+
+      {% if results %}
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th style="text-align:center;">Test</th>
+              <th style="text-align:center;">Assignment</th>
+              <th style="text-align:center;">Exam</th>
+              <th style="text-align:center;">Total</th>
+              <th style="text-align:center;">Grade</th>
+              <th style="text-align:center;">Position</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for result in results %}
+            <tr>
+              <td><strong>{{ result.subject.subject_name }}</strong></td>
+              <td style="text-align:center;">{{ result.test_score }}</td>
+              <td style="text-align:center;">{{ result.assignment_score }}</td>
+              <td style="text-align:center;">{{ result.exam_score }}</td>
+              <td style="text-align:center;"><strong>{{ result.total_score }}</strong></td>
+              <td style="text-align:center;">
+                <span class="grade-{{ result.grade }}">{{ result.grade }}</span>
+              </td>
+              <td style="text-align:center;">
+                {% if result.position == 1 %}🥇{% elif result.position == 2 %}🥈{% elif result.position == 3 %}🥉{% endif %}
+                {{ result.position }}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="card-body" style="color:var(--muted); font-size:13px;">No scores entered for this student yet.</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  {% else %}
+  <div class="card">
+    <div class="empty-state">
+      <div class="empty-icon">🎒</div>
+      <h3>No students in {{ selected_arm.name }}</h3>
+      <p>Assign students to this class arm first.</p>
+    </div>
+  </div>
+  {% endif %}
+
+{% elif class_arms %}
+  <div class="card">
+    <div class="empty-state">
+      <div class="empty-icon">📊</div>
+      <h3>Select a class arm above</h3>
+      <p>Choose a class arm from the dropdown to view its results.</p>
+    </div>
+  </div>
+{% else %}
+  <div class="card">
+    <div class="empty-state">
+      <div class="empty-icon">🏫</div>
+      <h3>No class arms yet</h3>
+      <p>Create class arms and assign students before viewing results.</p>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

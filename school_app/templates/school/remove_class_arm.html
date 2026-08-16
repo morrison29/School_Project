@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>Update Teacher Class</title>
+<style>
+body{font-family:Arial;background:#f4f6f9;padding:20px}
+form{background:white;padding:20px;border-radius:8px;max-width:400px;margin:auto}
+h2{text-align:center}
+select,button{width:100%;padding:10px;margin-top:10px}
+button{background:#2563eb;color:white;border:none;border-radius:5px}
+</style>
+</head>
+
+<body>
+
+<h2>Remove Class for {{ teacher.user.first_name }} {{ teacher.user.last_name }}</h2>
+
+<form method="post">
+{% csrf_token %}
+<button type="submit">Remove Class</button>
+
+
+</form>
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+{% extends 'school/base.html' %}
+{% block title %}Start New Term{% endblock %}
+{% block page_title %}Academic Term{% endblock %}
+{% block nav_results_admin %}active{% endblock %}
+{% block breadcrumb %}<span>/</span> Start New Term{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>🗓️ Start New Term</h1>
+    <p>Set the active session and term. All new scores will be recorded against this term.</p>
+  </div>
+  <a href="{% url 'school_app:admin-dashboard' %}" class="btn btn-outline">← Dashboard</a>
+</div>
+
+{% if current_term %}
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-body" style="padding:16px 20px;">
+    <span style="font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase;">Currently Active</span>
+    <div style="font-size:16px; font-weight:700; margin-top:4px;">{{ current_term }}</div>
+  </div>
+</div>
+{% endif %}
+
+<div class="card" style="max-width:520px;">
+  <div class="card-header">
+    <span class="card-title">New / Existing Term</span>
+  </div>
+  <div class="card-body" style="padding:20px;">
+    <form method="POST">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="session_name">Session (e.g. 2025/2026)</label>
+        <input id="session_name" name="session_name" class="form-control" placeholder="2025/2026" required>
+      </div>
+      <div class="form-group">
+        <label for="term_name">Term</label>
+        <select id="term_name" name="term_name" class="form-control" required>
+          <option value="first">First Term</option>
+          <option value="second">Second Term</option>
+          <option value="third">Third Term</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Set as Active Term</button>
+    </form>
+  </div>
+</div>
+
+{% if sessions %}
+<div class="card" style="margin-top:20px;">
+  <div class="card-header">
+    <span class="card-title">All Sessions</span>
+  </div>
+  <div class="card-body" style="padding:16px 20px;">
+    {% for session in sessions %}
+      <div style="padding:6px 0;">{{ session.name }}{% if session.is_current %} <span class="badge badge-muted">Current</span>{% endif %}</div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

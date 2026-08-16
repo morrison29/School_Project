@@ -1,0 +1,35 @@
+{% extends 'school/base.html' %}
+{% block title %}Complete Profile{% endblock %}
+{% block page_title %}Complete Your Profile{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Complete Your Profile</h1>
+    <p>Add your personal details to finish setting up your student account.</p>
+  </div>
+</div>
+
+<div class="card" style="max-width:520px;">
+  <div class="card-header"><span class="card-title">Personal Details</span></div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="date_of_birth">Date of Birth <span class="required">*</span></label>
+        <input type="date" id="date_of_birth" name="date_of_birth" class="form-control" required />
+      </div>
+      <div class="form-group">
+        <label for="phone_number">Phone Number <span class="required">*</span></label>
+        <input type="tel" id="phone_number" name="phone_number" class="form-control" placeholder="e.g. +234 801 234 5678" required />
+      </div>
+      <div class="form-group">
+        <label for="address">Home Address <span class="required">*</span></label>
+        <textarea id="address" name="address" class="form-control" placeholder="Street, city, state" required></textarea>
+      </div>
+      <hr />
+      <button type="submit" class="btn btn-success">Save & Go to Dashboard</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

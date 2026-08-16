@@ -1,0 +1,59 @@
+{% extends 'school/base.html' %}
+{% block title %}Subjects{% endblock %}
+{% block page_title %}Subjects{% endblock %}
+{% block nav_subjects %}active{% endblock %}
+{% block breadcrumb %}<span>/</span> Subjects{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Register Subject</h1>
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 1.5fr; gap:20px; align-items:start;">
+  <!-- Form -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">New Subject</span></div>
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="subject_name">Subject Name <span class="required">*</span></label>
+          <input type="text" id="subject_name" name="subject_name" class="form-control" placeholder="e.g. Mathematics" required autofocus />
+        </div>
+        <button type="submit" class="btn btn-primary">Add Subject</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- List -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">All Subjects</span>
+      <span class="badge badge-muted">{{ subjects.count }} total</span>
+    </div>
+    {% if subjects %}
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>#</th><th>Subject Name</th><th>Actions</th></tr></thead>
+        <tbody>
+          {% for subject in subjects %}
+          <tr>
+            <td style="color:var(--muted);">{{ forloop.counter }}</td>
+            <td><strong>{{ subject.subject_name }}</strong></td>
+            <td>
+              <form method="post" action="{% url 'school_app:delete_subject' subject.id %}" style="display:inline;" onsubmit="return confirm('Delete {{ subject.subject_name }}?')">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><div class="empty-icon">📚</div><h3>No subjects yet</h3><p>Add your first subject using the form.</p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

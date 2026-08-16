@@ -1,0 +1,46 @@
+{% extends 'school/base.html' %}
+{% block title %}Create Assignment{% endblock %}
+{% block page_title %}Create Assignment{% endblock %}
+{% block nav_assignments %}active{% endblock %}
+{% block breadcrumb %}<span>/</span> Assignments <span>/</span> Create{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Create Midterm Assignment</h1>
+    <p>Create an assignment for your class arm.</p>
+  </div>
+  <a href="{% url 'school_app:teacher-dashboard' %}" class="btn btn-outline">← Dashboard</a>
+</div>
+
+<div class="card" style="max-width:600px;">
+  <div class="card-header"><span class="card-title">Assignment Details</span></div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="subject">Subject <span class="required">*</span></label>
+        <select id="subject" name="subject" class="form-control" required>
+          <option value="">— Select a subject —</option>
+          {% for subject in subjects %}
+          <option value="{{ subject.id }}">{{ subject.subject_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="due_date">Due Date <span class="required">*</span></label>
+        <input type="date" id="due_date" name="due_date" class="form-control" required />
+      </div>
+      <div class="form-group">
+        <label for="description">Assignment Description / Questions <span class="required">*</span></label>
+        <textarea id="description" name="description" class="form-control" style="min-height:160px;" placeholder="Describe the assignment or list the questions here…" required></textarea>
+      </div>
+      <hr />
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">Create Assignment</button>
+        <a href="{% url 'school_app:teacher-dashboard' %}" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

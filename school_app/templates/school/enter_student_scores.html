@@ -1,0 +1,138 @@
+{% extends 'school/base.html' %}
+{% block title %}Scores — {{ student.user.get_full_name }}{% endblock %}
+{% block page_title %}Enter Scores{% endblock %}
+{% block nav_teacher_dash %}active{% endblock %}
+{% block breadcrumb %}
+  <span>/</span>
+  <a href="{% url 'school_app:enter_scores' class_arm.id %}">{{ class_arm.name }}</a>
+  <span>/</span> {{ student.user.get_full_name }}
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  .score-input {
+    width: 80px;
+    padding: 7px 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: center;
+    font-family: inherit;
+    font-weight: 600;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .score-input:focus {
+    outline: none;
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(30,58,95,.1);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>✏️ {{ student.user.get_full_name }}</h1>
+    <p>
+      {{ class_arm.name }}
+      {% if student.registration_number %}· Reg: <strong>{{ student.registration_number }}</strong>{% endif %}
+    </p>
+  </div>
+  <a href="{% url 'school_app:enter_scores' class_arm.id %}" class="btn btn-outline">← Back to Students</a>
+</div>
+
+{% if subjects %}
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">Subject Scores</span>
+    <p style="font-size:12px; color:var(--muted); margin:0;">Test /20 &nbsp;·&nbsp; Assignment /10 &nbsp;·&nbsp; Exam /70 &nbsp;·&nbsp; Total /100</p>
+  </div>
+  <form method="post">
+    {% csrf_token %}
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th style="text-align:center;">Test<br/><span style="font-weight:400; font-size:10px;">/20</span></th>
+            <th style="text-align:center;">Assignment<br/><span style="font-weight:400; font-size:10px;">/10</span></th>
+            <th style="text-align:center;">Exam<br/><span style="font-weight:400; font-size:10px;">/70</span></th>
+            <th style="text-align:center;">Saved Total</th>
+            <th style="text-align:center;">Grade</th>
+            <th style="text-align:center;">Position</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for subject in subjects %}
+          {% with r=existing|default:None %}
+          <tr>
+            <td><strong>{{ subject.subject_name }}</strong></td>
+            <td style="text-align:center;">
+              <input type="number" name="test_{{ subject.id }}" class="score-input"
+                min="0" max="20" step="0.5" placeholder="0"
+                value="{% for sid, res in existing.items %}{% if sid == subject.id %}{{ res.test_score }}{% endif %}{% endfor %}"
+              />
+            </td>
+            <td style="text-align:center;">
+              <input type="number" name="assignment_{{ subject.id }}" class="score-input"
+                min="0" max="10" step="0.5" placeholder="0"
+                value="{% for sid, res in existing.items %}{% if sid == subject.id %}{{ res.assignment_score }}{% endif %}{% endfor %}"
+              />
+            </td>
+            <td style="text-align:center;">
+              <input type="number" name="exam_{{ subject.id }}" class="score-input"
+                min="0" max="70" step="0.5" placeholder="0"
+                value="{% for sid, res in existing.items %}{% if sid == subject.id %}{{ res.exam_score }}{% endif %}{% endfor %}"
+              />
+            </td>
+            <td style="text-align:center;">
+              {% for sid, res in existing.items %}
+                {% if sid == subject.id %}
+                  <strong style="font-size:15px; color:var(--navy);">{{ res.total_score }}</strong>
+                {% endif %}
+              {% endfor %}
+            </td>
+            <td style="text-align:center;">
+              {% for sid, res in existing.items %}
+                {% if sid == subject.id %}
+                  <span class="grade-{{ res.grade }}" style="font-size:15px;">{{ res.grade }}</span>
+                {% endif %}
+              {% endfor %}
+            </td>
+            <td style="text-align:center;">
+              {% for sid, res in existing.items %}
+                {% if sid == subject.id %}
+                  {% if res.position == 1 %}🥇
+                  {% elif res.position == 2 %}🥈
+                  {% elif res.position == 3 %}🥉
+                  {% else %}<span style="color:var(--muted);">{{ res.position }}th</span>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+            </td>
+          </tr>
+          {% endwith %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div style="padding:16px 20px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+      <p style="font-size:12.5px; color:var(--muted);">Grades and positions are recalculated automatically on save.</p>
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">💾 Save Scores</button>
+        <a href="{% url 'school_app:enter_scores' class_arm.id %}" class="btn btn-outline">Cancel</a>
+      </div>
+    </div>
+  </form>
+</div>
+{% else %}
+<div class="card">
+  <div class="empty-state">
+    <div class="empty-icon">📚</div>
+    <h3>No subjects assigned to {{ class_arm.name }}</h3>
+    <p>Ask the administrator to assign subjects to this class arm first.</p>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

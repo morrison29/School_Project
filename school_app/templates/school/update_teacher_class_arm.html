@@ -1,0 +1,41 @@
+{% extends 'school/base.html' %}
+{% block title %}Change Teacher Class{% endblock %}
+{% block page_title %}Change Teacher Class{% endblock %}
+{% block nav_teachers %}active{% endblock %}
+{% block breadcrumb %}<span>/</span> <a href="{% url 'school_app:view_teachers' %}">Teachers</a> <span>/</span> Change Class{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Change Class Arm</h1>
+    <p>Reassign {{ teacher.user.get_full_name }} to a different class arm.</p>
+  </div>
+  <a href="{% url 'school_app:view_teachers' %}" class="btn btn-outline">← Back to Teachers</a>
+</div>
+
+<div class="card" style="max-width:520px;">
+  <div class="card-header"><span class="card-title">{{ teacher.user.get_full_name }}</span></div>
+  <div class="card-body">
+    <div class="info-list" style="margin-bottom:20px;">
+      <div class="info-row"><span class="info-label">Current Class</span><span class="info-value"><strong>{{ teacher.class_arm.name|default:"None" }}</strong></span></div>
+    </div>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="class_arm">New Class Arm <span class="required">*</span></label>
+        <select id="class_arm" name="class_arm" class="form-control" required>
+          <option value="">— Select a class arm —</option>
+          {% for arm in class_arms %}
+          <option value="{{ arm.id }}" {% if teacher.class_arm and teacher.class_arm.id == arm.id %}selected{% endif %}>{{ arm.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <hr />
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">Update Class Arm</button>
+        <a href="{% url 'school_app:view_teachers' %}" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

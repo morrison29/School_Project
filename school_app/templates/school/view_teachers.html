@@ -1,0 +1,89 @@
+{% extends 'school/base.html' %}
+{% block title %}Teachers{% endblock %}
+{% block page_title %}Teachers{% endblock %}
+{% block nav_teachers %}active{% endblock %}
+{% block breadcrumb %}<span>/</span> Teachers{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Teachers</h1>
+    <p>{{ teachers.count }} teacher{{ teachers.count|pluralize }} registered</p>
+  </div>
+  {% if request.user.is_superuser %}
+  <a href="{% url 'school_app:register_teacher' %}" class="btn btn-primary">+ Register Teacher</a>
+  {% endif %}
+</div>
+
+<div class="card">
+  {% if teachers %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Class Arm</th>
+          <th>Status</th>
+          {% if request.user.is_superuser %}<th>Actions</th>{% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for teacher in teachers %}
+        <tr>
+          <td style="color:var(--muted);">{{ forloop.counter }}</td>
+          <td><strong>{{ teacher.user.get_full_name }}</strong></td>
+          <td>{{ teacher.user.username }}</td>
+          <td>{{ teacher.user.email }}</td>
+          <td>
+            {% if teacher.class_arm %}
+              <span class="badge badge-navy">{{ teacher.class_arm.name }}</span>
+            {% else %}
+              <span class="badge badge-muted">Unassigned</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if teacher.user.is_active %}
+              <span class="badge badge-success">Active</span>
+            {% else %}
+              <span class="badge badge-error">Inactive</span>
+            {% endif %}
+          </td>
+          {% if request.user.is_superuser %}
+          <td>
+            <div class="actions">
+              {% if teacher.class_arm %}
+                <a href="{% url 'school_app:update_teacher_class_arm' teacher.id %}" class="btn btn-outline btn-sm">Change Class</a>
+                <form method="post" action="{% url 'school_app:remove_teacher_class_arm' teacher.id %}" style="display:inline;" onsubmit="return confirm('Remove this teacher from their class arm?')">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-outline btn-sm">Remove Class</button>
+                </form>
+              {% else %}
+                <a href="{% url 'school_app:assign_teacher_class' %}" class="btn btn-outline btn-sm">Assign Class</a>
+              {% endif %}
+              <form method="post" action="{% url 'school_app:delete_teacher' teacher.id %}" style="display:inline;" onsubmit="return confirm('Delete this teacher? This action cannot be undone.')">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+              </form>
+            </div>
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">👨‍🏫</div>
+    <h3>No teachers yet</h3>
+    <p>Register your first teacher to get started.</p>
+    {% if request.user.is_superuser %}
+    <a href="{% url 'school_app:register_teacher' %}" class="btn btn-primary" style="margin-top:16px;">+ Register Teacher</a>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

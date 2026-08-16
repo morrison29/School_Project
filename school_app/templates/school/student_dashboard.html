@@ -1,0 +1,69 @@
+{% extends 'school/base.html' %}
+{% block title %}Student Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block nav_student_dash %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Hello, {{ request.user.first_name }}! 👋</h1>
+    <p>
+      {% if class_arm %}
+        You are enrolled in <strong>{{ class_arm.name }}</strong>.
+      {% else %}
+        You have not been assigned to a class yet.
+      {% endif %}
+    </p>
+  </div>
+</div>
+
+{% if class_arm %}
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-icon navy">📚</div>
+    <div class="stat-value">{{ class_arm.subjects.count|default:"0" }}</div>
+    <div class="stat-label">Subjects</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green">📊</div>
+    <div class="stat-value">{{ results_count|default:"0" }}</div>
+    <div class="stat-label">Results Available</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange">👨‍🏫</div>
+    <div class="stat-value" style="font-size:14px; padding-top:6px;">{{ teacher.user.get_full_name|default:"—" }}</div>
+    <div class="stat-label">Class Teacher</div>
+  </div>
+</div>
+
+<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px;">
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">🏫 My Class — {{ class_arm.name }}</span>
+    </div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:10px;padding:16px 20px;">
+      <a href="{% url 'school_app:view-subjects' class_arm.id %}" class="btn btn-outline" style="justify-content:flex-start;">📚 View My Subjects</a>
+      <a href="{% url 'school_app:view_midterm_assignment' class_arm.id %}" class="btn btn-outline" style="justify-content:flex-start;">📝 View Assignments</a>
+      <a href="{% url 'school_app:student-results' %}" class="btn btn-outline" style="justify-content:flex-start;">📊 View My Results</a>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">👤 My Account</span>
+    </div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:10px;padding:16px 20px;">
+      <a href="{% url 'school_app:student_profile' %}" class="btn btn-outline" style="justify-content:flex-start;">👤 View Profile</a>
+      <a href="{% url 'school_app:edit_student_profile' %}" class="btn btn-outline" style="justify-content:flex-start;">✏️ Edit Profile</a>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="card">
+  <div class="empty-state">
+    <div class="empty-icon">🏫</div>
+    <h3>Not enrolled in a class yet</h3>
+    <p>Your administrator will assign you to a class arm. Check back soon.</p>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

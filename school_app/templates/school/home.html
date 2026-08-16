@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduManage — School Management System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #1E3A5F; --navy-light: #2a5080;
+      --green: #2E8B57; --green-light: #38a169;
+      --bg: #F0F4F8; --surface: #fff; --text: #1A202C; --muted: #718096;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+    header {
+      background: var(--navy);
+      padding: 0 40px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .brand-icon {
+      width: 36px; height: 36px; background: var(--green);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px;
+    }
+    .brand span { font-weight: 700; font-size: 18px; color: #fff; }
+    .header-cta {
+      display: flex; gap: 10px;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 18px; border-radius: 8px; font-size: 14px; font-weight: 600;
+      text-decoration: none; cursor: pointer; border: none; transition: .15s;
+    }
+    .btn-outline-white { background: transparent; border: 1px solid rgba(255,255,255,.4); color: #fff; }
+    .btn-outline-white:hover { background: rgba(255,255,255,.1); }
+    .btn-white { background: #fff; color: var(--navy); }
+    .btn-white:hover { background: #F0F4F8; }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 60%, #1a6b4a 100%);
+      padding: 80px 40px;
+      text-align: center;
+      color: #fff;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+      border-radius: 100px; padding: 4px 14px;
+      font-size: 12px; font-weight: 600; letter-spacing: .5px;
+      margin-bottom: 24px;
+    }
+    .hero h1 { font-size: clamp(28px, 5vw, 48px); font-weight: 800; line-height: 1.15; max-width: 640px; margin: 0 auto 16px; }
+    .hero p { font-size: 16px; color: rgba(255,255,255,.75); max-width: 500px; margin: 0 auto 36px; line-height: 1.6; }
+    .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-green { background: var(--green); color: #fff; font-size: 15px; padding: 12px 28px; border-radius: 8px; }
+    .btn-green:hover { background: var(--green-light); }
+
+    /* Stats bar */
+    .stats-bar {
+      background: var(--surface);
+      border-bottom: 1px solid #E2E8F0;
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+    }
+    .stat-item {
+      padding: 24px 40px;
+      text-align: center;
+      border-right: 1px solid #E2E8F0;
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-item .num { font-size: 28px; font-weight: 800; color: var(--navy); }
+    .stat-item .lbl { font-size: 12px; color: var(--muted); font-weight: 500; margin-top: 2px; }
+
+    /* Features */
+    .section { padding: 64px 40px; max-width: 1100px; margin: 0 auto; }
+    .section-label { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--green); margin-bottom: 8px; }
+    .section h2 { font-size: 28px; font-weight: 800; margin-bottom: 12px; }
+    .section .sub { color: var(--muted); font-size: 15px; margin-bottom: 40px; max-width: 520px; line-height: 1.6; }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    }
+    .feature-icon { font-size: 28px; margin-bottom: 12px; }
+    .feature-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .feature-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    /* Roles */
+    .roles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+    .role-card {
+      border-radius: 10px; padding: 28px 24px;
+      text-decoration: none; color: var(--text);
+      border: 1px solid #E2E8F0;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .role-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.10); }
+    .role-card.admin   { background: linear-gradient(135deg, #EBF2F9, #fff); border-color: #BFD7EF; }
+    .role-card.teacher { background: linear-gradient(135deg, #EBF5F0, #fff); border-color: #B2DFC4; }
+    .role-card.student { background: linear-gradient(135deg, #F3F0FF, #fff); border-color: #C9BFEF; }
+    .role-icon { font-size: 36px; margin-bottom: 12px; }
+    .role-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+    .role-card p { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 16px; }
+    .role-link { font-size: 13px; font-weight: 600; color: var(--navy); display: flex; align-items: center; gap: 4px; }
+
+    footer {
+      background: var(--navy);
+      color: rgba(255,255,255,.5);
+      text-align: center;
+      padding: 24px 40px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 640px) {
+      header { padding: 0 20px; }
+      .hero { padding: 56px 20px; }
+      .section { padding: 48px 20px; }
+      .stat-item { padding: 18px 24px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="{% url 'school_app:home' %}" class="brand">
+      <div class="brand-icon">🎓</div>
+      <span>EduManage</span>
+    </a>
+    <div class="header-cta">
+      <a href="{% url 'school_app:login' %}" class="btn btn-outline-white">Sign In</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-badge">🏫 School Management System</div>
+    <h1>Manage your school with clarity and confidence</h1>
+    <p>EduManage brings together student records, teacher assignments, academic scoring, and class management in one clean platform.</p>
+    <div class="hero-actions">
+      <a href="{% url 'school_app:login' %}" class="btn btn-green">Get Started →</a>
+    </div>
+  </section>
+
+  <div class="stats-bar">
+    <div class="stat-item"><div class="num">3</div><div class="lbl">User Roles</div></div>
+    <div class="stat-item"><div class="num">∞</div><div class="lbl">Class Arms</div></div>
+    <div class="stat-item"><div class="num">OTP</div><div class="lbl">Verified Accounts</div></div>
+    <div class="stat-item"><div class="num">Live</div><div class="lbl">Score Computation</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Features</div>
+    <h2>Everything you need to run a school</h2>
+    <p class="sub">From registering teachers to computing student positions, EduManage handles the administration so you can focus on education.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🔐</div>
+        <h3>Role-Based Access</h3>
+        <p>Admin, Teachers, and Students each see only what's relevant to them. Secure by design.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✉️</div>
+        <h3>Email Verification</h3>
+        <p>Every account is verified via OTP before activation, keeping your data trustworthy.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Score & Position Tracking</h3>
+        <p>Enter test, assignment, and exam scores. Grades and class positions are computed automatically.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🏫</div>
+        <h3>Class Arm Management</h3>
+        <p>Create class arms, assign teachers and students, and manage subject allocations with ease.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📝</div>
+        <h3>Midterm Assignments</h3>
+        <p>Teachers can create, manage, and distribute midterm assignments to their class arms.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🆔</div>
+        <h3>Registration Numbers</h3>
+        <p>Registration numbers are assigned officially after email verification for full control.</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:#fff; padding: 1px 0;">
+    <div class="section">
+      <div class="section-label">Access</div>
+      <h2>Your role determines your view</h2>
+      <p class="sub">Each user type has a tailored dashboard with exactly what they need.</p>
+      <div class="roles-grid">
+        <div class="role-card admin">
+          <div class="role-icon">🛡️</div>
+          <h3>Administrator</h3>
+          <p>Full control over teachers, students, class arms, and subjects. The central command for your school.</p>
+          <div class="role-link">Sign in as Admin →</div>
+        </div>
+        <div class="role-card teacher">
+          <div class="role-icon">👨‍🏫</div>
+          <h3>Teacher</h3>
+          <p>Manage your assigned class arm, create assignments, enter scores, and track student progress.</p>
+          <div class="role-link">Sign in as Teacher →</div>
+        </div>
+        <div class="role-card student">
+          <div class="role-icon">🎒</div>
+          <h3>Student</h3>
+          <p>View your results, check assignments, and manage your profile — all in one place.</p>
+          <div class="role-link">Sign in as Student →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>© {% now "Y" %} EduManage. All rights reserved.</p>
+  </footer>
+</body>
+</html>

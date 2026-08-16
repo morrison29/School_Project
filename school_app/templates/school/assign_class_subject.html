@@ -1,0 +1,50 @@
+{% extends 'school/base.html' %}
+{% block title %}Assign Subjects to Class{% endblock %}
+{% block page_title %}Assign Subjects{% endblock %}
+{% block nav_assign_subject %}active{% endblock %}
+{% block breadcrumb %}<span>/</span> Assign Subjects{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Assign Subjects to Class Arm</h1>
+    <p>Select a class arm and choose which subjects it offers. This replaces any prior selection.</p>
+  </div>
+  <a href="{% url 'school_app:admin-dashboard' %}" class="btn btn-outline">← Dashboard</a>
+</div>
+
+<div class="card" style="max-width:600px;">
+  <div class="card-header"><span class="card-title">Subject Assignment</span></div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="class_arm">Class Arm <span class="required">*</span></label>
+        <select id="class_arm" name="class_arm" class="form-control" required>
+          <option value="">— Select a class arm —</option>
+          {% for arm in class_arms %}
+          <option value="{{ arm.id }}">{{ arm.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Subjects <span class="required">*</span></label>
+        <p class="form-hint" style="margin-bottom:10px;">Hold Ctrl (Windows) or ⌘ (Mac) to select multiple.</p>
+        <div style="border:1px solid var(--border); border-radius:8px; padding:12px; display:flex; flex-wrap:wrap; gap:10px;">
+          {% for subject in subjects %}
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:400;">
+            <input type="checkbox" name="subject" value="{{ subject.id }}" style="width:15px; height:15px; cursor:pointer;" />
+            {{ subject.subject_name }}
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+      <hr />
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">Save Subject Assignment</button>
+        <a href="{% url 'school_app:admin-dashboard' %}" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

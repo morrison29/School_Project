@@ -1,0 +1,30 @@
+{% extends 'school/base.html' %}
+{% block title %}{{ class_arm.name }} — Subjects{% endblock %}
+{% block page_title %}{{ class_arm.name }} Subjects{% endblock %}
+{% block breadcrumb %}<span>/</span> <a href="{% url 'school_app:view_classarm' class_arm.id %}">{{ class_arm.name }}</a> <span>/</span> Subjects{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>📚 {{ class_arm.name }} — Subjects</h1>
+    <p>{{ subjects.count }} subject{{ subjects.count|pluralize }} assigned to this class</p>
+  </div>
+  <a href="{% url 'school_app:view_classarm' class_arm.id %}" class="btn btn-outline">← Back to Class</a>
+</div>
+
+<div class="card">
+  {% if subjects %}
+  <div class="card-body">
+    <div style="display:flex; flex-wrap:wrap; gap:10px;">
+      {% for subject in subjects %}
+      <div style="background:#F7FAFC; border:1px solid var(--border); border-radius:8px; padding:14px 20px; font-size:14px; font-weight:600;">
+        📖 {{ subject.subject_name }}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% else %}
+  <div class="empty-state"><div class="empty-icon">📚</div><h3>No subjects assigned</h3><p>The administrator needs to assign subjects to this class arm.</p></div>
+  {% endif %}
+</div>
+{% endblock %}

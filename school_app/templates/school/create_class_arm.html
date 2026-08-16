@@ -1,0 +1,34 @@
+{% extends 'school/base.html' %}
+{% block title %}Create Class Arm{% endblock %}
+{% block page_title %}Create Class Arm{% endblock %}
+{% block nav_classes %}active{% endblock %}
+{% block breadcrumb %}<span>/</span> <a href="{% url 'school_app:view_all_class_arms' %}">Class Arms</a> <span>/</span> Create{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Create Class Arm</h1>
+    <p>Add a new class arm to your school.</p>
+  </div>
+  <a href="{% url 'school_app:view_all_class_arms' %}" class="btn btn-outline">← Back</a>
+</div>
+
+<div class="card" style="max-width:480px;">
+  <div class="card-header"><span class="card-title">Class Arm Details</span></div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="name">Class Arm Name <span class="required">*</span></label>
+        <input type="text" id="name" name="name" class="form-control" placeholder="e.g. JSS 1A, SS 2B" required autofocus />
+        <p class="form-hint">Names must be unique. Use a clear naming convention.</p>
+      </div>
+      <hr />
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">Create Class Arm</button>
+        <a href="{% url 'school_app:view_all_class_arms' %}" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

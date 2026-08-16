@@ -1,0 +1,42 @@
+{% extends 'school/base.html' %}
+{% block title %}{{ class_arm.name }} — Students{% endblock %}
+{% block page_title %}{{ class_arm.name }} Students{% endblock %}
+{% block breadcrumb %}<span>/</span> <a href="{% url 'school_app:view_all_class_arms' %}">Class Arms</a> <span>/</span> {{ class_arm.name }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>🎒 {{ class_arm.name }} — Students</h1>
+    <p>{{ students.count }} student{{ students.count|pluralize }} in this class arm</p>
+  </div>
+  <a href="{% url 'school_app:view_classarm' class_arm.id %}" class="btn btn-outline">← Class Details</a>
+</div>
+
+<div class="card">
+  {% if students %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Name</th><th>Reg. Number</th><th>Username</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        {% for student in students %}
+        <tr>
+          <td style="color:var(--muted);">{{ forloop.counter }}</td>
+          <td><strong>{{ student.user.get_full_name }}</strong></td>
+          <td>{{ student.registration_number|default:"—" }}</td>
+          <td>{{ student.user.username }}</td>
+          <td>
+            {% if student.user.is_active %}<span class="badge badge-success">Active</span>
+            {% else %}<span class="badge badge-error">Unverified</span>{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><div class="empty-icon">🎒</div><h3>No students in this class</h3><p>Assign students to this class arm first.</p></div>
+  {% endif %}
+</div>
+{% endblock %}

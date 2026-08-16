@@ -1,0 +1,84 @@
+{% extends 'school/base.html' %}
+{% block title %}Teacher Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block nav_teacher_dash %}active{% endblock %}
+
+{% block content %}
+{% with profile=request.user.teacherprofile %}
+<div class="page-header">
+  <div>
+    <h1>Good day, {{ request.user.first_name }}!</h1>
+    <p>
+      {% if profile.class_arm %}
+        You are managing <strong>{{ profile.class_arm.name }}</strong>.
+      {% else %}
+        You have not been assigned to a class arm yet.
+      {% endif %}
+    </p>
+  </div>
+  {% if profile.class_arm %}
+  <div class="actions">
+    <a href="{% url 'school_app:create_midterm_assignment' %}" class="btn btn-primary">+ New Assignment</a>
+    <a href="{% url 'school_app:enter-scores' profile.class_arm.id %}" class="btn btn-success">📊 Enter Scores</a>
+  </div>
+  {% endif %}
+</div>
+
+{% if profile.class_arm %}
+<!-- Class overview stats -->
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-icon green">🎒</div>
+    <div class="stat-value">{{ profile.class_arm.students.count|default:"0" }}</div>
+    <div class="stat-label">Students in Class</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon navy">📚</div>
+    <div class="stat-value">{{ profile.class_arm.subjects.count|default:"0" }}</div>
+    <div class="stat-label">Subjects</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange">📝</div>
+    <div class="stat-value">{{ assignments_count|default:"0" }}</div>
+    <div class="stat-label">Assignments Created</div>
+  </div>
+</div>
+
+<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px;">
+  <!-- My class -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">🏫 {{ profile.class_arm.name }}</span>
+      <a href="{% url 'school_app:view_classarm' profile.class_arm.id %}" class="btn btn-outline btn-sm">View Class</a>
+    </div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:10px;padding:16px 20px;">
+      <a href="{% url 'school_app:view_students_in_class_arm' profile.class_arm.id %}" class="btn btn-outline" style="justify-content:flex-start;">🎒 View Students</a>
+      <a href="{% url 'school_app:view-subjects' profile.class_arm.id %}" class="btn btn-outline" style="justify-content:flex-start;">📚 View Subjects</a>
+      <a href="{% url 'school_app:enter-scores' profile.class_arm.id %}" class="btn btn-outline" style="justify-content:flex-start;">📊 Enter Scores</a>
+      <a href="{% url 'school_app:view_midterm_assignment' profile.class_arm.id %}" class="btn btn-outline" style="justify-content:flex-start;">📝 View Assignments</a>
+    </div>
+  </div>
+
+  <!-- Quick actions -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">⚡ Quick Actions</span>
+    </div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:10px;padding:16px 20px;">
+      <a href="{% url 'school_app:create_midterm_assignment' %}" class="btn btn-outline" style="justify-content:flex-start;">➕ Create Assignment</a>
+      <a href="{% url 'school_app:teacher_profile' %}" class="btn btn-outline" style="justify-content:flex-start;">👤 Edit Profile</a>
+    </div>
+  </div>
+</div>
+
+{% else %}
+<div class="card">
+  <div class="empty-state">
+    <div class="empty-icon">🏫</div>
+    <h3>No class assigned yet</h3>
+    <p>The administrator will assign you to a class arm. Check back soon.</p>
+  </div>
+</div>
+{% endif %}
+{% endwith %}
+{% endblock %}

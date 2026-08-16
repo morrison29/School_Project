@@ -1,0 +1,50 @@
+{% extends 'school/base.html' %}
+{% block title %}Assign Student to Class{% endblock %}
+{% block page_title %}Assign Student to Class{% endblock %}
+{% block nav_assign_student %}active{% endblock %}
+{% block breadcrumb %}<span>/</span> Assign Student{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Assign Student to Class Arm</h1>
+    <p>Select an unassigned student and place them in a class arm.</p>
+  </div>
+  <a href="{% url 'school_app:admin-dashboard' %}" class="btn btn-outline">← Dashboard</a>
+</div>
+
+<div class="card" style="max-width:560px;">
+  <div class="card-header"><span class="card-title">Assignment</span></div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="student_id">Student <span class="required">*</span></label>
+        <select id="student_id" name="student_id" class="form-control" required>
+          <option value="">— Select a student —</option>
+          {% for student in students %}
+          <option value="{{ student.id }}">
+            {{ student.user.get_full_name }} ({{ student.user.username }})
+            {% if student.class_arm %} — already in {{ student.class_arm.name }}{% endif %}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="class_arm">Class Arm <span class="required">*</span></label>
+        <select id="class_arm" name="class_arm" class="form-control" required>
+          <option value="">— Select a class arm —</option>
+          {% for arm in class_arms %}
+          <option value="{{ arm.id }}">{{ arm.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <hr />
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">Assign Student</button>
+        <a href="{% url 'school_app:admin-dashboard' %}" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

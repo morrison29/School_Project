@@ -1,0 +1,73 @@
+{% extends 'school/base.html' %}
+{% block title %}Assign Registration Number{% endblock %}
+{% block page_title %}Assign Registration Number{% endblock %}
+{% block nav_students %}active{% endblock %}
+{% block breadcrumb %}<span>/</span> <a href="{% url 'school_app:view_students' %}">Students</a> <span>/</span> Assign Reg No.{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Assign Registration Number</h1>
+    <p>Officially assign a registration number to this verified student.</p>
+  </div>
+  <a href="{% url 'school_app:view_students' %}" class="btn btn-outline">← Back to Students</a>
+</div>
+
+<div class="card" style="max-width:520px;">
+  <div class="card-header">
+    <span class="card-title">Student: {{ student.user.get_full_name }}</span>
+    <span class="badge badge-{% if student.registration_number %}success{% else %}muted{% endif %}">
+      {% if student.registration_number %}Has Reg No.{% else %}No Reg No.{% endif %}
+    </span>
+  </div>
+  <div class="card-body">
+
+    {% if student.registration_number %}
+    <div class="message info" style="margin-bottom:16px;">
+      ℹ Current registration number: <strong>{{ student.registration_number }}</strong>. Submitting below will overwrite it.
+    </div>
+    {% endif %}
+
+    <div class="info-list" style="margin-bottom:20px;">
+      <div class="info-row">
+        <span class="info-label">Full Name</span>
+        <span class="info-value">{{ student.user.get_full_name }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Username</span>
+        <span class="info-value">{{ student.user.username }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Email</span>
+        <span class="info-value">{{ student.user.email }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Class Arm</span>
+        <span class="info-value">{{ student.class_arm|default:"Not assigned" }}</span>
+      </div>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="registration_number">Registration Number <span class="required">*</span></label>
+        <input
+          type="text"
+          id="registration_number"
+          name="registration_number"
+          class="form-control"
+          placeholder="e.g. SCH/2025/001"
+          value="{{ student.registration_number }}"
+          required
+        />
+        <p class="form-hint">Must be unique across all students.</p>
+      </div>
+      <hr />
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">Assign Registration Number</button>
+        <a href="{% url 'school_app:view_students' %}" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

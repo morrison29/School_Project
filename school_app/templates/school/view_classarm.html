@@ -1,0 +1,125 @@
+{% extends 'school/base.html' %}
+{% load group_tags %}
+{% block title %}{{ class_arms.name }}{% endblock %}
+{% block page_title %}{{ class_arms.name }}{% endblock %}
+{% block nav_classes %}active{% endblock %}
+{% block breadcrumb %}<span>/</span> <a href="{% url 'school_app:view_all_class_arms' %}">Class Arms</a> <span>/</span> {{ class_arms.name }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>🏫 {{ class_arms.name }}</h1>
+    <p>{{ students.count }} student{{ students.count|pluralize }} enrolled &nbsp;·&nbsp; {{ subjects.count }} subject{{ subjects.count|pluralize }}</p>
+  </div>
+  {% if request.user.is_superuser %}
+  <div class="actions">
+    <a href="{% url 'school_app:assign_teacher_class' %}" class="btn btn-outline">Assign Teacher</a>
+    <a href="{% url 'school_app:assign_class_subject' %}" class="btn btn-outline">Assign Subjects</a>
+    <form method="post" action="{% url 'school_app:promote_student' class_arms.id %}" onsubmit="return confirm('This will unassign all students from {{ class_arms.name }}. Continue?')">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-primary">🎓 Promote All Students</button>
+    </form>
+  </div>
+  {% endif %}
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
+  <!-- Teacher -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">👨‍🏫 Class Teacher</span></div>
+    <div class="card-body">
+      {% if teacher %}
+      <div class="info-list">
+        <div class="info-row"><span class="info-label">Name</span><span class="info-value"><strong>{{ teacher.user.get_full_name }}</strong></span></div>
+        <div class="info-row"><span class="info-label">Username</span><span class="info-value">{{ teacher.user.username }}</span></div>
+        <div class="info-row"><span class="info-label">Email</span><span class="info-value">{{ teacher.user.email }}</span></div>
+      </div>
+      {% if request.user.is_superuser %}
+      <div style="margin-top:16px;" class="actions">
+        <a href="{% url 'school_app:update_teacher_class_arm' teacher.id %}" class="btn btn-outline btn-sm">Change Teacher</a>
+        <form method="post" action="{% url 'school_app:remove_teacher_class_arm' teacher.id %}" style="display:inline;" onsubmit="return confirm('Remove teacher from this class?')">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-outline btn-sm">Remove</button>
+        </form>
+      </div>
+      {% endif %}
+      {% else %}
+      <div class="empty-state" style="padding:24px;">
+        <p>No teacher assigned.</p>
+        {% if request.user.is_superuser %}
+        <a href="{% url 'school_app:assign_teacher_class' %}" class="btn btn-outline btn-sm" style="margin-top:10px;">Assign Teacher</a>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Subjects -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">📚 Subjects</span></div>
+    <div class="card-body">
+      {% if subjects %}
+      <div style="display:flex; flex-wrap:wrap; gap:8px;">
+        {% for subject in subjects %}
+        <span class="badge badge-navy" style="font-size:13px; padding:5px 12px;">{{ subject.subject_name }}</span>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state" style="padding:16px;"><p>No subjects assigned.</p></div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Students -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">🎒 Students ({{ students.count }})</span>
+    {% if request.user.is_superuser %}
+    <a href="{% url 'school_app:assign_student_class' %}" class="btn btn-outline btn-sm">Assign Student</a>
+    {% endif %}
+  </div>
+  {% if students %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Reg. Number</th>
+          <th>Username</th>
+          {% if request.user.is_superuser or request.user|has_group:"Teachers" %}<th>Actions</th>{% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for student in students %}
+        <tr>
+          <td style="color:var(--muted);">{{ forloop.counter }}</td>
+          <td><strong>{{ student.user.get_full_name }}</strong></td>
+          <td>{{ student.registration_number|default:"—" }}</td>
+          <td>{{ student.user.username }}</td>
+          {% if request.user.is_superuser or request.user|has_group:"Teachers" %}
+          <td>
+            <div class="actions">
+              {% if request.user|has_group:"Teachers" %}
+              <a href="{% url 'school_app:view_student_results_as_teacher' student.id %}" class="btn btn-outline btn-sm">Results</a>
+              {% endif %}
+              {% if request.user.is_superuser %}
+              <form method="post" action="{% url 'school_app:remove_student_class_arm' student.id %}" style="display:inline;" onsubmit="return confirm('Remove student from this class?')">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline btn-sm">Remove</button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><div class="empty-icon">🎒</div><h3>No students enrolled</h3><p>Assign students to this class arm.</p></div>
+  {% endif %}
+</div>
+{% endblock %}

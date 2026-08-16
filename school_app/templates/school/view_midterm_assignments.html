@@ -1,0 +1,56 @@
+{% extends 'school/base.html' %}
+{% load group_tags %}
+{% block title %}Assignments — {{ class_arm.name }}{% endblock %}
+{% block page_title %}Assignments{% endblock %}
+{% block nav_assignments %}active{% endblock %}
+{% block breadcrumb %}<span>/</span> Assignments{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>📝 Assignments — {{ class_arm.name }}</h1>
+    <p>{{ assignments.count }} assignment{{ assignments.count|pluralize }}</p>
+  </div>
+  {% if request.user|has_group:"Teachers" %}
+  <a href="{% url 'school_app:create_midterm_assignment' %}" class="btn btn-primary">+ New Assignment</a>
+  {% endif %}
+</div>
+
+{% if assignments %}
+<div style="display:flex; flex-direction:column; gap:16px;">
+  {% for assignment in assignments %}
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <span class="card-title">{{ assignment.subject.subject_name }}</span>
+        <div style="font-size:12px; color:var(--muted); margin-top:2px;">Due: <strong>{{ assignment.due_date }}</strong></div>
+      </div>
+      <div class="actions">
+        <a href="{% url 'school_app:view_each_midterm_assignment' assignment.id %}" class="btn btn-outline btn-sm">View</a>
+        {% if request.user|has_group:"Teachers" %}
+        <form method="post" action="{% url 'school_app:delete_midterm_assignment' assignment.id %}" style="display:inline;" onsubmit="return confirm('Delete this assignment?')">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+    <div class="card-body" style="padding:14px 20px;">
+      <p style="font-size:13.5px; color:var(--text); line-height:1.6;">{{ assignment.description|truncatechars:200 }}</p>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card">
+  <div class="empty-state">
+    <div class="empty-icon">📝</div>
+    <h3>No assignments yet</h3>
+    <p>There are no midterm assignments for this class.</p>
+    {% if request.user|has_group:"Teachers" %}
+    <a href="{% url 'school_app:create_midterm_assignment' %}" class="btn btn-primary" style="margin-top:16px;">+ Create Assignment</a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends 'school/base.html' %}
+{% block title %}My Results{% endblock %}
+{% block page_title %}Academic Results{% endblock %}
+{% block nav_student_dash %}active{% endblock %}
+{% block breadcrumb %}<span>/</span> My Results{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>📊 My Results</h1>
+    <p>Your academic performance for this term.</p>
+  </div>
+  <div style="display:flex; gap:10px;">
+    <a href="{% url 'school_app:download-student-results-pdf' %}" class="btn btn-primary">⬇ Download PDF</a>
+    <a href="{% url 'school_app:student-dashboard' %}" class="btn btn-outline">← Dashboard</a>
+  </div>
+</div>
+
+{% if all_terms %}
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-body" style="padding:12px 20px;">
+    <form method="get" style="display:flex; align-items:center; gap:10px;">
+      <label for="term" style="font-size:13px; font-weight:600; white-space:nowrap;">Viewing:</label>
+      <select id="term" name="term" class="form-control" onchange="this.form.submit()" style="max-width:260px;">
+        {% for t in all_terms %}
+        <option value="{{ t.id }}" {% if selected_term and selected_term.id == t.id %}selected{% endif %}>{{ t }}</option>
+        {% endfor %}
+      </select>
+    </form>
+  </div>
+</div>
+{% endif %}
+
+<!-- Summary info card -->
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-body" style="padding:20px;">
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:16px;">
+      <div>
+        <div style="font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Name</div>
+        <div style="font-size:16px; font-weight:700;">{{ student.user.get_full_name }}</div>
+      </div>
+      <div>
+        <div style="font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Class</div>
+        <div style="font-size:16px; font-weight:700;">{{ student.class_arm.name|default:"—" }}</div>
+      </div>
+      <div>
+        <div style="font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Average</div>
+        <div style="font-size:16px; font-weight:700;">{{ overall_average }}</div>
+      </div>
+      <div>
+        <div style="font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Position in Class</div>
+        <div style="font-size:16px; font-weight:700;">
+          {% if class_position %}
+            {% if class_position == 1 %}🥇{% elif class_position == 2 %}🥈{% elif class_position == 3 %}🥉{% endif %}
+            {{ class_position }}
+          {% else %}
+            —
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Result table -->
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-header">
+    <span class="card-title">Result Sheet</span>
+  </div>
+
+  {% if results %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th style="text-align:center;">Test</th>
+          <th style="text-align:center;">Assignment</th>
+          <th style="text-align:center;">Exam</th>
+          <th style="text-align:center;">Total</th>
+          <th style="text-align:center;">Grade</th>
+          <th style="text-align:center;">Position</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for result in results %}
+        <tr>
+          <td><strong>{{ result.subject.subject_name }}</strong></td>
+          <td style="text-align:center;">{{ result.test_score }}</td>
+          <td style="text-align:center;">{{ result.assignment_score }}</td>
+          <td style="text-align:center;">{{ result.exam_score }}</td>
+          <td style="text-align:center;"><strong>{{ result.total_score }}</strong></td>
+          <td style="text-align:center;">
+            <span class="grade-{{ result.grade }}">{{ result.grade }}</span>
+          </td>
+          <td style="text-align:center;">
+            {% if result.position == 1 %}🥇{% elif result.position == 2 %}🥈{% elif result.position == 3 %}🥉{% endif %}
+            {{ result.position }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📭</div>
+    <h3>No results yet</h3>
+    <p>No scores have been entered for you yet.</p>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Automated comment -->
+{% if results %}
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">Teacher's Comment</span>
+  </div>
+  <div class="card-body" style="padding:20px;">
+    <p style="margin:0; font-style:italic;">"{{ comment }}"</p>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

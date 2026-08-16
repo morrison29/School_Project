@@ -1,0 +1,49 @@
+{% extends 'school/base.html' %}
+{% block title %}My Profile{% endblock %}
+{% block page_title %}Profile{% endblock %}
+{% block nav_student_dash %}active{% endblock %}
+{% block breadcrumb %}<span>/</span> My Profile{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>👤 My Profile</h1>
+    <p>Your personal and academic details.</p>
+  </div>
+  <a href="{% url 'school_app:edit_student_profile' %}" class="btn btn-primary">✏️ Edit Profile</a>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">Profile Details</span>
+  </div>
+  <div class="card-body" style="padding:24px 20px;">
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:20px;">
+      <div>
+        <div style="font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Name</div>
+        <div style="font-size:15px; font-weight:700;">{{ profile.user.first_name }} {{ profile.user.last_name }}</div>
+      </div>
+      <div>
+        <div style="font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Registration Number</div>
+        <div style="font-size:15px; font-weight:700;">{{ profile.registration_number|default:"—" }}</div>
+      </div>
+      <div>
+        <div style="font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Date of Birth</div>
+        <div style="font-size:15px; font-weight:700;">{{ profile.date_of_birth|default:"—" }}</div>
+      </div>
+      <div>
+        <div style="font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Class Arm</div>
+        <div style="font-size:15px; font-weight:700;">{{ profile.class_arm.name|default:"—" }}</div>
+      </div>
+      <div>
+        <div style="font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Phone</div>
+        <div style="font-size:15px; font-weight:700;">{{ profile.phone_number|default:"—" }}</div>
+      </div>
+      <div>
+        <div style="font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Address</div>
+        <div style="font-size:15px; font-weight:700;">{{ profile.address|default:"—" }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

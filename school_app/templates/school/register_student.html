@@ -1,0 +1,58 @@
+{% extends 'school/base.html' %}
+{% block title %}Register Student{% endblock %}
+{% block page_title %}Register Student{% endblock %}
+{% block nav_students %}active{% endblock %}
+{% block breadcrumb %}<span>/</span> <a href="{% url 'school_app:view_students' %}">Students</a> <span>/</span> Register{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Register Student</h1>
+    <p>Create a new student account. The registration number is assigned separately after email verification.</p>
+  </div>
+  <a href="{% url 'school_app:view_students' %}" class="btn btn-outline">← Back to Students</a>
+</div>
+
+<div class="card" style="max-width:600px;">
+  <div class="card-header"><span class="card-title">Student Details</span></div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-row">
+        <div class="form-group">
+          <label for="first_name">First Name <span class="required">*</span></label>
+          <input type="text" id="first_name" name="first_name" class="form-control" placeholder="e.g. John" required />
+        </div>
+        <div class="form-group">
+          <label for="last_name">Last Name <span class="required">*</span></label>
+          <input type="text" id="last_name" name="last_name" class="form-control" placeholder="e.g. Doe" required />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="username">Username <span class="required">*</span></label>
+        <input type="text" id="username" name="username" class="form-control" placeholder="e.g. jdoe2025" required />
+      </div>
+      <div class="form-group">
+        <label for="email">Email Address <span class="required">*</span></label>
+        <input type="email" id="email" name="email" class="form-control" placeholder="e.g. john@example.com" required />
+        
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="password">Password <span class="required">*</span></label>
+          <input type="password" id="password" name="password" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label for="confirm_password">Confirm Password <span class="required">*</span></label>
+          <input type="password" id="confirm_password" name="confirm_password" class="form-control" required />
+        </div>
+      </div>
+      <hr />
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">Register</button>
+        <a href="{% url 'school_app:view_students' %}" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

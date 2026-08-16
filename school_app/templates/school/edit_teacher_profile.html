@@ -1,0 +1,35 @@
+{% extends 'school/base.html' %}
+{% block title %}Edit Profile{% endblock %}
+{% block page_title %}Profile{% endblock %}
+{% block nav_teacher_dash %}active{% endblock %}
+{% block breadcrumb %}<span>/</span> <a href="{% url 'school_app:teacher_profile' %}">My Profile</a> <span>/</span> Edit{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>✏️ Edit Profile</h1>
+    <p>Update your contact details.</p>
+  </div>
+  <a href="{% url 'school_app:teacher_profile' %}" class="btn btn-outline">← Back to Profile</a>
+</div>
+
+<div class="card" style="max-width:520px;">
+  <div class="card-header">
+    <span class="card-title">Contact Details</span>
+  </div>
+  <div class="card-body" style="padding:20px;">
+    <form method="POST">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="address">Address</label>
+        <textarea id="address" name="address" class="form-control" rows="3">{{ profile.address }}</textarea>
+      </div>
+      <div class="form-group">
+        <label for="phone_number">Phone Number</label>
+        <input id="phone_number" name="phone_number" class="form-control" value="{{ profile.phone_number }}">
+      </div>
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
