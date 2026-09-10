@@ -72,3 +72,12 @@ def view_class_subjects(request, class_arm_id):
     class_arm = get_object_or_404(ClassArm, id=class_arm_id)
     subjects = class_arm.subjects.all()
     return render(request, 'school/view_class_subjects.html', {'class_arm': class_arm, 'subjects': subjects})
+
+
+@teacher_required
+def my_subjects(request):
+    """Teacher-facing 'Subjects' link — scoped to their own class arm only."""
+    profile = getattr(request.user, 'teacherprofile', None)
+    class_arm = profile.class_arm if profile else None
+    subjects = class_arm.subjects.all() if class_arm else Subject.objects.none()
+    return render(request, 'school/view_class_subjects.html', {'class_arm': class_arm, 'subjects': subjects})

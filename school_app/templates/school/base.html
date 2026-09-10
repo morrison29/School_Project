@@ -19,9 +19,9 @@
       --navy-light: #2a5080;
       --green:      #2E8B57;
       --green-light:#38a169;
-      --bg:         #F0F4F8;
+      --bg:         #E6EBF2;
       --surface:    #ffffff;
-      --border:     #E2E8F0;
+      --border:     #D3DCE6;
       --text:       #1A202C;
       --muted:      #718096;
       --success-bg: #F0FFF4;
@@ -211,6 +211,7 @@
     .content {
       padding: 28px;
       flex: 1;
+      background: var(--bg);
     }
 
     /* ── Toast messages ── */
@@ -235,7 +236,7 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 2px 8px rgba(30,58,95,.06);
     }
     .card-header {
       padding: 18px 24px 16px;
@@ -483,6 +484,58 @@
 
     /* ── Divider ── */
     hr { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+    /* ── Centered form cards (register/create/edit/assign pages) ── */
+    .card-form { margin: 0 auto; }
+
+    /* ── Password field with show/hide toggle ── */
+    .pw-wrap { position: relative; }
+    .pw-wrap input.form-control { padding-right: 56px; }
+    .pw-toggle {
+      position: absolute;
+      top: 50%;
+      right: 6px;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1;
+      padding: 6px 8px;
+      color: var(--navy);
+      border-radius: 6px;
+    }
+    .pw-toggle:hover { background: var(--bg); }
+
+    /* ── Disabled submit state ── */
+    .btn:disabled,
+    .btn.btn-disabled {
+      opacity: .5;
+      cursor: not-allowed;
+      box-shadow: none;
+      pointer-events: none;
+    }
+
+    /* ── Field-level validation messages ── */
+    .field-hint {
+      display: none;
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--error-tx);
+    }
+    .field-hint.show { display: block; }
+    .form-control.invalid { border-color: #E53E3E; }
+
+    /* ── Summary note near a disabled submit button ── */
+    .submit-hint {
+      display: none;
+      flex-basis: 100%;   /* drop to its own line inside the .actions flex row */
+      margin-top: 8px;
+      font-size: 12.5px;
+      color: var(--error-tx);
+    }
+    .submit-hint.show { display: block; }
   </style>
   {% block extra_head %}{% endblock %}
 </head>
@@ -520,8 +573,8 @@
       <div class="nav-section-label">Teacher</div>
       <a href="{% url 'school_app:teacher-dashboard' %}" class="nav-link {% block nav_teacher_dash %}{% endblock %}"><span class="icon">🏠</span> Dashboard</a>
       <div class="nav-section-label">My Class</div>
-      <a href="{% url 'school_app:view_students' %}" class="nav-link {% block nav_my_students %}{% endblock %}"><span class="icon">🎒</span> My Students</a>
-      <a href="{% url 'school_app:view_all_subjects' %}" class="nav-link {% block nav_my_subjects %}{% endblock %}"><span class="icon">📚</span> Subjects</a>
+      <a href="{% url 'school_app:my_students' %}" class="nav-link {% block nav_my_students %}{% endblock %}"><span class="icon">🎒</span> My Students</a>
+      <a href="{% url 'school_app:my_subjects' %}" class="nav-link {% block nav_my_subjects %}{% endblock %}"><span class="icon">📚</span> Subjects</a>
       <div class="nav-section-label">Academic</div>
       <a href="{% url 'school_app:create_midterm_assignment' %}" class="nav-link {% block nav_assignments %}{% endblock %}"><span class="icon">📝</span> Assignments</a>
       <div class="nav-section-label">Account</div>
@@ -599,6 +652,125 @@
         document.getElementById('overlay').classList.remove('show');
       }
     });
+  });
+
+  // ── Password show/hide toggles (text, no icons) ──
+  document.querySelectorAll('input[type="password"]').forEach(function (input) {
+    var wrap = document.createElement('div');
+    wrap.className = 'pw-wrap';
+    input.parentNode.insertBefore(wrap, input);
+    wrap.appendChild(input);
+
+    var toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'pw-toggle';
+    toggle.textContent = 'Show';
+    toggle.setAttribute('aria-label', 'Show password');
+    toggle.addEventListener('click', function () {
+      var isHidden = input.type === 'password';
+      input.type = isHidden ? 'text' : 'password';
+      toggle.textContent = isHidden ? 'Hide' : 'Show';
+      toggle.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+    });
+    wrap.appendChild(toggle);
+  });
+
+  // ── Disable submit until required fields (and password rules) are satisfied,
+  //     and tell the user exactly what's missing ──
+  document.querySelectorAll('form').forEach(function (form) {
+    var submitBtn = form.querySelector('button[type="submit"]');
+    if (!submitBtn) return;
+
+    var requiredFields = Array.prototype.slice.call(
+      form.querySelectorAll('input[required], select[required], textarea[required]')
+    );
+    if (!requiredFields.length) return; // nothing to validate — leave as-is
+
+    var pwdField = form.querySelector('input[type="password"]:not([id*="confirm"])');
+    var confirmField = form.querySelector('input[type="password"][id*="confirm"]');
+    var MIN_PW_LEN = 8;
+
+    // Give every required field its own inline error line.
+    var hints = new Map();
+    requiredFields.forEach(function (el) {
+      var hint = document.createElement('div');
+      hint.className = 'field-hint';
+      el.insertAdjacentElement('afterend', hint);
+      hints.set(el, hint);
+    });
+
+    // Summary line under the submit button explaining why it's disabled.
+    var submitHint = document.createElement('div');
+    submitHint.className = 'submit-hint';
+    submitBtn.insertAdjacentElement('afterend', submitHint);
+
+    function labelFor(el) {
+      var label = form.querySelector('label[for="' + el.id + '"]');
+      return label ? label.textContent.replace('*', '').trim() : 'This field';
+    }
+
+    function fieldMessage(el) {
+      if (!el.value.trim()) return labelFor(el) + ' is required.';
+      if (el.type === 'email' && !el.checkValidity()) return 'Enter a valid email address.';
+      if (!el.checkValidity()) return labelFor(el) + ' is not valid.';
+      if (el === pwdField && confirmField && el.value.length < MIN_PW_LEN) {
+        return 'Password must be at least ' + MIN_PW_LEN + ' characters.';
+      }
+      if (el === confirmField && pwdField && pwdField.value && el.value && el.value !== pwdField.value) {
+        return 'Passwords do not match.';
+      }
+      return '';
+    }
+
+    function isValid() {
+      return requiredFields.every(function (el) { return fieldMessage(el) === ''; });
+    }
+
+    function refresh(showAll) {
+      var firstProblem = '';
+      requiredFields.forEach(function (el) {
+        var touched = showAll || el.dataset.touched === '1';
+        var msg = fieldMessage(el);
+        var hint = hints.get(el);
+        if (touched && msg) {
+          hint.textContent = msg;
+          hint.classList.add('show');
+          el.classList.add('invalid');
+          if (!firstProblem) firstProblem = msg;
+        } else {
+          hint.classList.remove('show');
+          el.classList.remove('invalid');
+        }
+      });
+
+      var valid = isValid();
+      submitBtn.disabled = !valid;
+      submitBtn.classList.toggle('btn-disabled', !valid);
+      if (!valid) {
+        submitHint.textContent = firstProblem || 'Fill in the required fields to continue.';
+        submitHint.classList.add('show');
+      } else {
+        submitHint.classList.remove('show');
+      }
+    }
+
+    requiredFields.forEach(function (el) {
+      el.addEventListener('blur', function () {
+        el.dataset.touched = '1';
+        refresh(false);
+      });
+    });
+
+    form.addEventListener('input', function () { refresh(false); });
+    form.addEventListener('change', function () { refresh(false); });
+    form.addEventListener('submit', function (e) {
+      if (!isValid()) {
+        e.preventDefault();
+        refresh(true); // reveal every problem, not just touched ones
+      }
+    });
+
+    refresh(false);
   });
 </script>
 {% block extra_scripts %}{% endblock %}

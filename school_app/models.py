@@ -84,7 +84,7 @@ class StudentProfile(models.Model):
     date_of_birth = models.DateField(null=True, blank=True)
     address = models.TextField(null=True, blank=True)
     phone_number = models.CharField(max_length=11)
-    class_arm = models.ForeignKey(ClassArm, on_delete=models.SET_NULL, null=True, blank=True)
+    class_arm = models.ForeignKey(ClassArm, on_delete=models.SET_NULL, null=True, blank=True, related_name='students')
 
     def __str__(self):
         return f"{self.user.username} - {self.registration_number}"
@@ -141,4 +141,3 @@ class Result(models.Model):
 
     def __str__(self):
         return f"{self.student.user.username} - {self.subject.subject_name}"
-

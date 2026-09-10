@@ -98,9 +98,9 @@
   <div class="card-header">
     <span class="card-title">📊 Results{% if current_term %} — <span style="font-weight:400; color:var(--muted); font-size:13px;">{{ current_term }}</span>{% endif %}</span>
   </div>
-  <div class="card-body" style="display:flex; flex-direction:column; gap:10px; padding:16px 20px;">
-    <a href="{% url 'school_app:admin_view_results' %}" class="btn btn-primary" style="justify-content:flex-start;">📊 View Academic Results by Class</a>
-    <a href="{% url 'school_app:start_new_term' %}" class="btn btn-outline" style="justify-content:flex-start;">🗓️ Start New Term</a>
+  <div class="card-body" style="display:flex; flex-wrap:wrap; gap:10px; padding:16px 20px;">
+    <a href="{% url 'school_app:admin_view_results' %}" class="btn btn-primary">📊 View Academic Results by Class</a>
+    <a href="{% url 'school_app:start_new_term' %}" class="btn btn-outline">🗓️ Start New Term</a>
   </div>
 </div>
 {% endblock %}

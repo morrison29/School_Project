@@ -13,7 +13,7 @@
   <a href="{% url 'school_app:view_students' %}" class="btn btn-outline">← Back to Students</a>
 </div>
 
-<div class="card" style="max-width:520px;">
+<div class="card card-form" style="max-width:520px;">
   <div class="card-header">
     <span class="card-title">Student: {{ student.user.get_full_name }}</span>
     <span class="badge badge-{% if student.registration_number %}success{% else %}muted{% endif %}">

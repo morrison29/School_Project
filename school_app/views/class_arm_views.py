@@ -4,6 +4,20 @@ from django.views.decorators.http import require_POST
 from school_app.models import ClassArm, StudentProfile, TeacherProfile
 from school_app.decorators import admin_required, teacher_required, student_required, admin_or_teacher_required
 
+
+def _own_class_arm_or_none(request):
+    """The requesting teacher's assigned ClassArm, or None (admins aren't teachers)."""
+    profile = getattr(request.user, 'teacherprofile', None)
+    return profile.class_arm if profile else None
+
+
+def _blocked_from_class_arm(request, class_arm):
+    """True if a non-admin is trying to view a class arm that isn't their own."""
+    if request.user.is_superuser:
+        return False
+    return _own_class_arm_or_none(request) != class_arm
+
+
 @admin_required
 def create_class_arm(request):
     if request.method == 'POST':
@@ -33,6 +47,9 @@ def view_all_class_arms(request):
 @admin_or_teacher_required
 def view_classarm(request, class_arm_id):
     class_arm = get_object_or_404(ClassArm, id=class_arm_id)
+    if _blocked_from_class_arm(request, class_arm):
+        messages.error(request, "You can only view your own assigned class.")
+        return redirect('school_app:teacher-dashboard')
     students = StudentProfile.objects.filter(class_arm=class_arm)
     teacher = TeacherProfile.objects.filter(class_arm=class_arm).first()
     subjects = class_arm.subjects.all()
@@ -47,6 +64,22 @@ def view_classarm(request, class_arm_id):
 @admin_or_teacher_required
 def view_students_in_class_arm(request, class_arm_id):
     class_arm = get_object_or_404(ClassArm, id=class_arm_id)
+    if _blocked_from_class_arm(request, class_arm):
+        messages.error(request, "You can only view your own assigned class.")
+        return redirect('school_app:teacher-dashboard')
+    students = StudentProfile.objects.filter(class_arm=class_arm)
+    return render(request, 'school/view_students_in_class_arm.html', {'class_arm': class_arm, 'students': students})
+
+
+@teacher_required
+def my_students(request):
+    """Teacher-facing 'My Students' — scoped to their own class arm only."""
+    class_arm = _own_class_arm_or_none(request)
+    if not class_arm:
+        return render(request, 'school/view_students_in_class_arm.html', {
+            'class_arm': None,
+            'students': [],
+        })
     students = StudentProfile.objects.filter(class_arm=class_arm)
     return render(request, 'school/view_students_in_class_arm.html', {'class_arm': class_arm, 'students': students})
 

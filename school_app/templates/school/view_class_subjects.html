@@ -1,9 +1,10 @@
 {% extends 'school/base.html' %}
-{% block title %}{{ class_arm.name }} — Subjects{% endblock %}
-{% block page_title %}{{ class_arm.name }} Subjects{% endblock %}
-{% block breadcrumb %}<span>/</span> <a href="{% url 'school_app:view_classarm' class_arm.id %}">{{ class_arm.name }}</a> <span>/</span> Subjects{% endblock %}
+{% block title %}{{ class_arm.name|default:"My Subjects" }} — Subjects{% endblock %}
+{% block page_title %}{{ class_arm.name|default:"My Subjects" }} Subjects{% endblock %}
+{% block breadcrumb %}{% if class_arm %}<span>/</span> <a href="{% url 'school_app:view_classarm' class_arm.id %}">{{ class_arm.name }}</a> <span>/</span> Subjects{% endif %}{% endblock %}
 
 {% block content %}
+{% if class_arm %}
 <div class="page-header">
   <div>
     <h1>📚 {{ class_arm.name }} — Subjects</h1>
@@ -27,4 +28,15 @@
   <div class="empty-state"><div class="empty-icon">📚</div><h3>No subjects assigned</h3><p>The administrator needs to assign subjects to this class arm.</p></div>
   {% endif %}
 </div>
+{% else %}
+<div class="page-header">
+  <div>
+    <h1>📚 My Subjects</h1>
+    <p>You have not been assigned to a class arm yet.</p>
+  </div>
+</div>
+<div class="card">
+  <div class="empty-state"><div class="empty-icon">🏫</div><h3>No class assigned</h3><p>Once an admin assigns you to a class arm, its subjects will show up here.</p></div>
+</div>
+{% endif %}
 {% endblock %}

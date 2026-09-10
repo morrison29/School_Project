@@ -2,14 +2,17 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from school_app.models import TeacherProfile, StudentProfile
 from school_app.decorators import teacher_required
-from school_app.models import ClassArm, Subject
+from school_app.models import ClassArm, Subject, MidtermAssignment
 
 @teacher_required
 def teacher_dashboard(request):
+    profile = get_object_or_404(TeacherProfile, user=request.user)
+    assignments_count = 0
+    if profile.class_arm:
+        assignments_count = MidtermAssignment.objects.filter(class_arm=profile.class_arm).count()
+
     context = {
-        'students_count':   ClassArm.objects.count(),
-        'subjects_count':   Subject.objects.count(),
-        
+        'assignments_count': assignments_count,
     }
     return render(request, 'school/teacher_dashboard.html', context)
 

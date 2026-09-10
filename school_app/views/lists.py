@@ -13,7 +13,7 @@ def view_teachers(request):
     return render(request, 'school/view_teachers.html', {'teachers': teachers, 'teachers_class': teachers_class})
 
 
-@admin_or_teacher_required
+@admin_required
 def view_students(request):
     students = StudentProfile.objects.all()
     students_class = students.filter(class_arm__isnull=False)
