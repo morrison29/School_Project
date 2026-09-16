@@ -61,7 +61,7 @@
                   <button type="submit" class="btn btn-outline btn-sm">Remove Class</button>
                 </form>
               {% else %}
-                <a href="{% url 'school_app:assign_teacher_class' %}" class="btn btn-outline btn-sm">Assign Class</a>
+                <a href="{% url 'school_app:assign_teacher_class' %}?teacher_id={{ teacher.id }}" class="btn btn-outline btn-sm">Assign Class</a>
               {% endif %}
               <form method="post" action="{% url 'school_app:delete_teacher' teacher.id %}" style="display:inline;" onsubmit="return confirm('Delete this teacher? This action cannot be undone.')">
                 {% csrf_token %}

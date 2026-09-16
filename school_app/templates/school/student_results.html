@@ -1,4 +1,5 @@
 {% extends 'school/base.html' %}
+{% load humanize %}
 {% block title %}My Results{% endblock %}
 {% block page_title %}Academic Results{% endblock %}
 {% block nav_student_dash %}active{% endblock %}
@@ -11,7 +12,7 @@
     <p>Your academic performance for this term.</p>
   </div>
   <div style="display:flex; gap:10px;">
-    <a href="{% url 'school_app:download-student-results-pdf' %}" class="btn btn-primary">⬇ Download PDF</a>
+    <a href="{% url 'school_app:download-student-results-pdf' %}{% if selected_term %}?term={{ selected_term.id }}{% endif %}" class="btn btn-primary">⬇ Download PDF</a>
     <a href="{% url 'school_app:student-dashboard' %}" class="btn btn-outline">← Dashboard</a>
   </div>
 </div>
@@ -31,7 +32,7 @@
 </div>
 {% endif %}
 
-<!-- Summary info card -->
+
 <div class="card" style="margin-bottom:20px;">
   <div class="card-body" style="padding:20px;">
     <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:16px;">
@@ -51,8 +52,7 @@
         <div style="font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Position in Class</div>
         <div style="font-size:16px; font-weight:700;">
           {% if class_position %}
-            {% if class_position == 1 %}🥇{% elif class_position == 2 %}🥈{% elif class_position == 3 %}🥉{% endif %}
-            {{ class_position }}
+            {{ class_position|ordinal }}
           {% else %}
             —
           {% endif %}
@@ -62,7 +62,7 @@
   </div>
 </div>
 
-<!-- Result table -->
+
 <div class="card" style="margin-bottom:20px;">
   <div class="card-header">
     <span class="card-title">Result Sheet</span>
@@ -94,8 +94,7 @@
             <span class="grade-{{ result.grade }}">{{ result.grade }}</span>
           </td>
           <td style="text-align:center;">
-            {% if result.position == 1 %}🥇{% elif result.position == 2 %}🥈{% elif result.position == 3 %}🥉{% endif %}
-            {{ result.position }}
+            {% if result.position %}{{ result.position|ordinal }}{% else %}—{% endif %}
           </td>
         </tr>
         {% endfor %}
@@ -111,7 +110,7 @@
   {% endif %}
 </div>
 
-<!-- Automated comment -->
+
 {% if results %}
 <div class="card">
   <div class="card-header">

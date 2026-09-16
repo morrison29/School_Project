@@ -23,7 +23,7 @@
         <select id="teacher_id" name="teacher_id" class="form-control" required>
           <option value="">— Select a teacher —</option>
           {% for teacher in teachers %}
-          <option value="{{ teacher.id }}">
+          <option value="{{ teacher.id }}" {% if selected_teacher_id|stringformat:"s" == teacher.id|stringformat:"s" %}selected{% endif %}>
             {{ teacher.user.get_full_name }}
             {% if teacher.class_arm %}(already in {{ teacher.class_arm.name }}){% endif %}
           </option>
@@ -35,7 +35,7 @@
         <select id="class_arm" name="class_arm" class="form-control" required>
           <option value="">— Select a class arm —</option>
           {% for arm in class_arms %}
-          <option value="{{ arm.id }}">{{ arm.name }}</option>
+          <option value="{{ arm.id }}" {% if selected_class_arm_id|stringformat:"s" == arm.id|stringformat:"s" %}selected{% endif %}>{{ arm.name }}</option>
           {% endfor %}
         </select>
       </div>

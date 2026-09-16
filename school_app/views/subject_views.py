@@ -1,9 +1,19 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from school_app.models import Subject, ClassArm
 from django.contrib import messages
 from school_app.decorators import admin_required, teacher_required, student_required, admin_or_teacher_required
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
+
+
+def _back_target(request, class_arm):
+    """Where 'Back to Class' should go, based on the viewer's role —
+    view_classarm is admin/teacher-only, so students need a different target."""
+    user = request.user
+    if user.is_superuser or user.groups.filter(name='Teachers').exists():
+        return reverse('school_app:view_classarm', args=[class_arm.id]), 'Back to Class'
+    return reverse('school_app:student-dashboard'), 'Back to Dashboard'
 
 @admin_required
 def register_subjects(request):
@@ -71,13 +81,21 @@ def assign_class_subject(request):
 def view_class_subjects(request, class_arm_id):
     class_arm = get_object_or_404(ClassArm, id=class_arm_id)
     subjects = class_arm.subjects.all()
-    return render(request, 'school/view_class_subjects.html', {'class_arm': class_arm, 'subjects': subjects})
+    back_url, back_label = _back_target(request, class_arm)
+    return render(request, 'school/view_class_subjects.html', {
+        'class_arm': class_arm, 'subjects': subjects,
+        'back_url': back_url, 'back_label': back_label,
+    })
 
 
-@teacher_required
+@login_required
 def my_subjects(request):
-    """Teacher-facing 'Subjects' link — scoped to their own class arm only."""
-    profile = getattr(request.user, 'teacherprofile', None)
+    """'Subjects' link for teachers and students — scoped to their own class arm only."""
+    profile = getattr(request.user, 'teacherprofile', None) or getattr(request.user, 'studentprofile', None)
     class_arm = profile.class_arm if profile else None
     subjects = class_arm.subjects.all() if class_arm else Subject.objects.none()
-    return render(request, 'school/view_class_subjects.html', {'class_arm': class_arm, 'subjects': subjects})
+    back_url, back_label = _back_target(request, class_arm) if class_arm else (None, None)
+    return render(request, 'school/view_class_subjects.html', {
+        'class_arm': class_arm, 'subjects': subjects,
+        'back_url': back_url, 'back_label': back_label,
+    })

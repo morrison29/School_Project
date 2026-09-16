@@ -1,3 +1,5 @@
+import csv
+import io
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from school_app.models import Term, AcademicSession
@@ -68,6 +70,162 @@ def admin_view_results(request):
         'student_results_map': student_results_map,
     })
 
+
+
+@teacher_required
+def download_scores_csv_template(request, class_arm_id):
+    class_arm = get_object_or_404(ClassArm, id=class_arm_id)
+    teacher_profile = get_object_or_404(TeacherProfile, user=request.user)
+
+    if class_arm != teacher_profile.class_arm:
+        messages.error(request, "You can only download the template for your own class arm.")
+        return redirect('school_app:teacher-dashboard')
+
+    current_term = get_current_term()
+    students = StudentProfile.objects.filter(class_arm=class_arm).select_related('user').order_by('user__last_name', 'user__first_name')
+    subjects = class_arm.subjects.all().order_by('subject_name')
+
+    existing = {}
+    if current_term:
+        for r in Result.objects.filter(class_arm=class_arm, term=current_term):
+            existing[(r.student_id, r.subject_id)] = r
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{class_arm.name}_scores_template.csv"'
+    writer = csv.writer(response)
+    writer.writerow(['username', 'subject', 'test', 'assignment', 'exam'])
+    for student in students:
+        for subject in subjects:
+            existing_result = existing.get((student.id, subject.id))
+            writer.writerow([
+                student.user.username,
+                subject.subject_name,
+                existing_result.test_score if existing_result else '',
+                existing_result.assignment_score if existing_result else '',
+                existing_result.exam_score if existing_result else '',
+            ])
+    return response
+
+
+@teacher_required
+def import_scores_csv(request, class_arm_id):
+    class_arm = get_object_or_404(ClassArm, id=class_arm_id)
+    teacher_profile = get_object_or_404(TeacherProfile, user=request.user)
+
+    if class_arm != teacher_profile.class_arm:
+        messages.error(request, "You can only import scores for your own class arm.")
+        return redirect('school_app:teacher-dashboard')
+
+    current_term = get_current_term()
+    if not current_term:
+        messages.error(request, "No active term set. Ask an admin to start a term first.")
+        return redirect('school_app:teacher-dashboard')
+
+    import_errors = []
+    success_count = 0
+
+    if request.method == "POST":
+        csv_file = request.FILES.get('csv_file')
+
+        if not csv_file:
+            import_errors.append("No file was uploaded.")
+        elif not csv_file.name.lower().endswith('.csv'):
+            import_errors.append("File must be a .csv file.")
+        elif csv_file.size > 2 * 1024 * 1024:
+            import_errors.append("File is too large (2MB max).")
+        else:
+            try:
+                decoded = csv_file.read().decode('utf-8-sig')
+            except UnicodeDecodeError:
+                import_errors.append("Could not read the file — make sure it's saved as CSV (UTF-8).")
+                decoded = None
+
+            if decoded is not None:
+                reader = csv.DictReader(io.StringIO(decoded))
+                required_cols = {'username', 'subject', 'test', 'assignment', 'exam'}
+                if not reader.fieldnames or not required_cols.issubset({c.strip().lower() for c in reader.fieldnames}):
+                    import_errors.append(
+                        "CSV header must include: username, subject, test, assignment, exam. "
+                        "Use the downloadable template to avoid formatting issues."
+                    )
+                else:
+                    # Normalize header lookups so column order / case doesn't matter.
+                    field_map = {c.strip().lower(): c for c in reader.fieldnames}
+                    students_by_username = {
+                        s.user.username.lower(): s
+                        for s in StudentProfile.objects.filter(class_arm=class_arm).select_related('user')
+                    }
+                    subjects_by_name = {s.subject_name.lower(): s for s in class_arm.subjects.all()}
+                    touched_subjects = {}
+
+                    for row_num, row in enumerate(reader, start=2):  # header is row 1
+                        username = (row.get(field_map['username']) or '').strip()
+                        subject_name = (row.get(field_map['subject']) or '').strip()
+
+                        if not username or not subject_name:
+                            import_errors.append(f"Row {row_num}: username and subject are required.")
+                            continue
+
+                        student = students_by_username.get(username.lower())
+                        if not student:
+                            import_errors.append(f"Row {row_num}: '{username}' is not a student in {class_arm.name}.")
+                            continue
+
+                        subject = subjects_by_name.get(subject_name.lower())
+                        if not subject:
+                            import_errors.append(f"Row {row_num}: '{subject_name}' is not assigned to {class_arm.name}.")
+                            continue
+
+                        try:
+                            test = float(row.get(field_map['test']) or 0)
+                            assignment = float(row.get(field_map['assignment']) or 0)
+                            exam = float(row.get(field_map['exam']) or 0)
+                        except ValueError:
+                            import_errors.append(f"Row {row_num}: scores must be numbers.")
+                            continue
+
+                        if not (0 <= test <= 20):
+                            import_errors.append(f"Row {row_num}: test score must be between 0 and 20.")
+                            continue
+                        if not (0 <= assignment <= 10):
+                            import_errors.append(f"Row {row_num}: assignment score must be between 0 and 10.")
+                            continue
+                        if not (0 <= exam <= 70):
+                            import_errors.append(f"Row {row_num}: exam score must be between 0 and 70.")
+                            continue
+
+                        total = calculate_total_score(test, assignment, exam)
+                        grade = calculate_grade(total)
+
+                        Result.objects.update_or_create(
+                            student=student,
+                            subject=subject,
+                            class_arm=class_arm,
+                            term=current_term,
+                            defaults={
+                                'session': current_term.session,
+                                'test_score': test,
+                                'assignment_score': assignment,
+                                'exam_score': exam,
+                                'total_score': total,
+                                'grade': grade,
+                            },
+                        )
+                        touched_subjects[subject.id] = subject
+                        success_count += 1
+
+                    for subject in touched_subjects.values():
+                        compute_positions(class_arm, subject, current_term)
+
+        if success_count and not import_errors:
+            messages.success(request, f"Imported {success_count} score{'s' if success_count != 1 else ''} successfully.")
+            return redirect('school_app:enter_scores', class_arm_id=class_arm.id)
+
+    return render(request, 'school/import_scores_csv.html', {
+        'class_arm': class_arm,
+        'import_errors': import_errors,
+        'success_count': success_count,
+    })
 
 
 @teacher_required
@@ -243,11 +401,25 @@ def view_student_results_as_admin(request, student_id):
         .distinct().select_related('session').order_by('-session__name', 'name')
     )
 
+    total_subjects = results.count()
+    overall_average = (
+        round(sum(r.total_score for r in results) / total_subjects, 1)
+        if total_subjects else 0
+    )
+    class_position = None
+    if student.class_arm and selected_term:
+        class_position = calculate_class_position(student.class_arm, selected_term).get(student.id)
+    comment = generate_comment(overall_average) if total_subjects else None
+
     return render(request, 'school/view_student_results_as_admin.html', {
         'student': student,
         'results': results,
         'selected_term': selected_term,
         'all_terms': all_terms,
+        'total_subjects': total_subjects,
+        'overall_average': overall_average,
+        'class_position': class_position,
+        'comment': comment,
     })
 @student_required
 def student_results(request):
@@ -308,9 +480,23 @@ def view_student_results_as_teacher(request, student_id):
         .distinct().select_related('session').order_by('-session__name', 'name')
     )
 
+    total_subjects = results.count()
+    overall_average = (
+        round(sum(r.total_score for r in results) / total_subjects, 1)
+        if total_subjects else 0
+    )
+    class_position = None
+    if student.class_arm and selected_term:
+        class_position = calculate_class_position(student.class_arm, selected_term).get(student.id)
+    comment = generate_comment(overall_average) if total_subjects else None
+
     return render(request, 'school/view_student_results_as_teacher.html', {
         'student': student,
         'results': results,
         'selected_term': selected_term,
         'all_terms': all_terms,
+        'total_subjects': total_subjects,
+        'overall_average': overall_average,
+        'class_position': class_position,
+        'comment': comment,
     })

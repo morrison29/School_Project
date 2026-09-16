@@ -13,7 +13,7 @@
   <a href="{% url 'school_app:admin-dashboard' %}" class="btn btn-outline">← Dashboard</a>
 </div>
 
-<div class="card" style="max-width:560px;">
+<div class="card card-form" style="max-width:560px;">
   <div class="card-header"><span class="card-title">Assignment</span></div>
   <div class="card-body">
     <form method="post">
@@ -23,7 +23,7 @@
         <select id="student_id" name="student_id" class="form-control" required>
           <option value="">— Select a student —</option>
           {% for student in students %}
-          <option value="{{ student.id }}">
+          <option value="{{ student.id }}" {% if selected_student_id|stringformat:"s" == student.id|stringformat:"s" %}selected{% endif %}>
             {{ student.user.get_full_name }} ({{ student.user.username }})
             {% if student.class_arm %} — already in {{ student.class_arm.name }}{% endif %}
           </option>
@@ -35,7 +35,7 @@
         <select id="class_arm" name="class_arm" class="form-control" required>
           <option value="">— Select a class arm —</option>
           {% for arm in class_arms %}
-          <option value="{{ arm.id }}">{{ arm.name }}</option>
+          <option value="{{ arm.id }}" {% if selected_class_arm_id|stringformat:"s" == arm.id|stringformat:"s" %}selected{% endif %}>{{ arm.name }}</option>
           {% endfor %}
         </select>
       </div>

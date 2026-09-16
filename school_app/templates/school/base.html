@@ -526,16 +526,6 @@
     }
     .field-hint.show { display: block; }
     .form-control.invalid { border-color: #E53E3E; }
-
-    /* ── Summary note near a disabled submit button ── */
-    .submit-hint {
-      display: none;
-      flex-basis: 100%;   /* drop to its own line inside the .actions flex row */
-      margin-top: 8px;
-      font-size: 12.5px;
-      color: var(--error-tx);
-    }
-    .submit-hint.show { display: block; }
   </style>
   {% block extra_head %}{% endblock %}
 </head>
@@ -580,11 +570,13 @@
       <div class="nav-section-label">Account</div>
       <a href="{% url 'school_app:teacher_profile' %}" class="nav-link {% block nav_teacher_profile %}{% endblock %}"><span class="icon">👤</span> Profile</a>
 
-    {% elif user|has_group:"Student" %}
+    {% elif user|has_group:"Students" %}
       <div class="nav-section-label">Student</div>
       <a href="{% url 'school_app:student-dashboard' %}" class="nav-link {% block nav_student_dash %}{% endblock %}"><span class="icon">🏠</span> Dashboard</a>
       <div class="nav-section-label">Academics</div>
-      <a href="{% url 'school_app:student_results' %}" class="nav-link {% block nav_results %}{% endblock %}"><span class="icon">📊</span> My Results</a>
+      <a href="{% url 'school_app:my_subjects' %}" class="nav-link {% block nav_my_subjects_student %}{% endblock %}"><span class="icon">📚</span> Subjects</a>
+      <a href="{% url 'school_app:my_assignments' %}" class="nav-link {% block nav_assignments_student %}{% endblock %}"><span class="icon">📝</span> Assignments</a>
+      <a href="{% url 'school_app:student-results' %}" class="nav-link {% block nav_results %}{% endblock %}"><span class="icon">📊</span> My Results</a>
       <div class="nav-section-label">Account</div>
       <a href="{% url 'school_app:student_profile' %}" class="nav-link {% block nav_student_profile %}{% endblock %}"><span class="icon">👤</span> Profile</a>
     {% endif %}
@@ -699,11 +691,6 @@
       hints.set(el, hint);
     });
 
-    // Summary line under the submit button explaining why it's disabled.
-    var submitHint = document.createElement('div');
-    submitHint.className = 'submit-hint';
-    submitBtn.insertAdjacentElement('afterend', submitHint);
-
     function labelFor(el) {
       var label = form.querySelector('label[for="' + el.id + '"]');
       return label ? label.textContent.replace('*', '').trim() : 'This field';
@@ -727,7 +714,6 @@
     }
 
     function refresh(showAll) {
-      var firstProblem = '';
       requiredFields.forEach(function (el) {
         var touched = showAll || el.dataset.touched === '1';
         var msg = fieldMessage(el);
@@ -736,7 +722,6 @@
           hint.textContent = msg;
           hint.classList.add('show');
           el.classList.add('invalid');
-          if (!firstProblem) firstProblem = msg;
         } else {
           hint.classList.remove('show');
           el.classList.remove('invalid');
@@ -746,12 +731,6 @@
       var valid = isValid();
       submitBtn.disabled = !valid;
       submitBtn.classList.toggle('btn-disabled', !valid);
-      if (!valid) {
-        submitHint.textContent = firstProblem || 'Fill in the required fields to continue.';
-        submitHint.classList.add('show');
-      } else {
-        submitHint.classList.remove('show');
-      }
     }
 
     requiredFields.forEach(function (el) {
@@ -775,4 +754,4 @@
 </script>
 {% block extra_scripts %}{% endblock %}
 </body>
-</html>
+</html>   

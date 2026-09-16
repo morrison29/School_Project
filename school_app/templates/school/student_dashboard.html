@@ -24,10 +24,11 @@
     <div class="stat-value">{{ class_arm.subjects.count|default:"0" }}</div>
     <div class="stat-label">Subjects</div>
   </div>
+
   <div class="stat-card">
-    <div class="stat-icon green">📊</div>
-    <div class="stat-value">{{ results_count|default:"0" }}</div>
-    <div class="stat-label">Results Available</div>
+    <div class="stat-icon orange">📝</div>
+    <div class="stat-value">{{ assignments_count|default:"0" }}</div>
+    <div class="stat-label">Assignments</div>
   </div>
   <div class="stat-card">
     <div class="stat-icon orange">👨‍🏫</div>
@@ -42,8 +43,8 @@
       <span class="card-title">🏫 My Class — {{ class_arm.name }}</span>
     </div>
     <div class="card-body" style="display:flex;flex-direction:column;gap:10px;padding:16px 20px;">
-      <a href="{% url 'school_app:view-subjects' class_arm.id %}" class="btn btn-outline" style="justify-content:flex-start;">📚 View My Subjects</a>
-      <a href="{% url 'school_app:view_midterm_assignment' class_arm.id %}" class="btn btn-outline" style="justify-content:flex-start;">📝 View Assignments</a>
+      <a href="{% url 'school_app:my_subjects' %}" class="btn btn-outline" style="justify-content:flex-start;">📚 View My Subjects</a>
+      <a href="{% url 'school_app:my_assignments' %}" class="btn btn-outline" style="justify-content:flex-start;">📝 View Assignments</a>
       <a href="{% url 'school_app:student-results' %}" class="btn btn-outline" style="justify-content:flex-start;">📊 View My Results</a>
     </div>
   </div>

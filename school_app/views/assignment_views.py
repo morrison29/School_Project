@@ -1,3 +1,4 @@
+import os
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -16,11 +17,13 @@ def create_midterm_assignment(request):
         return redirect('school_app:teacher-dashboard')
 
     if request.method == "POST":
+        title = request.POST.get('title', '').strip()
         description = request.POST.get('description', '').strip()
         subject_id = request.POST.get('subject')
         due_date = request.POST.get('due_date')
+        attachment = request.FILES.get('attachment')
 
-        if not all([description, subject_id, due_date]):
+        if not all([title, description, subject_id, due_date]):
             messages.error(request, "All fields are required.")
             return redirect('school_app:create_midterm_assignment')
 
@@ -30,11 +33,23 @@ def create_midterm_assignment(request):
             messages.error(request, "Selected subject is not assigned to your class arm.")
             return redirect('school_app:create_midterm_assignment')
 
+        if attachment:
+            ext = attachment.name.rsplit('.', 1)[-1].lower() if '.' in attachment.name else ''
+            if ext not in ('pdf', 'doc', 'docx'):
+                messages.error(request, "Attachment must be a PDF or Word document (.pdf, .doc, .docx).")
+                return redirect('school_app:create_midterm_assignment')
+            max_size = 10 * 1024 * 1024  # 10MB
+            if attachment.size > max_size:
+                messages.error(request, "Attachment must be under 10MB.")
+                return redirect('school_app:create_midterm_assignment')
+
         MidtermAssignment.objects.create(
+            title=title,
             description=description,
             subject=subject,
             class_arm=class_arm,
             due_date=due_date,
+            attachment=attachment,
         )
         messages.success(request, "Midterm assignment created successfully.")
         return redirect('school_app:teacher-dashboard')
@@ -61,6 +76,15 @@ def view_midterm_assignments(request, class_arm_id):
     return render(request, 'school/view_midterm_assignments.html', {'class_arm': class_arm, 'assignments': assignments})
 
 
+@student_required
+def my_assignments(request):
+    """Student-facing 'Assignments' link — scoped to their own class arm only."""
+    profile = getattr(request.user, 'studentprofile', None)
+    class_arm = profile.class_arm if profile else None
+    assignments = MidtermAssignment.objects.filter(class_arm=class_arm) if class_arm else None
+    return render(request, 'school/view_midterm_assignments.html', {'class_arm': class_arm, 'assignments': assignments})
+
+
 @login_required
 def view_each_midterm_assignment(request, assignment_id):
     assignment = get_object_or_404(MidtermAssignment, id=assignment_id)
@@ -74,7 +98,10 @@ def view_each_midterm_assignment(request, assignment_id):
         messages.error(request, "You do not have permission to view this assignment.")
         return redirect('school_app:login')
 
-    return render(request, 'school/view_each_midterm_assignment.html', {'assignment': assignment})
+    return render(request, 'school/view_each_midterm_assignment.html', {
+        'assignment': assignment,
+        'attachment_filename': os.path.basename(assignment.attachment.name) if assignment.attachment else None,
+    })
 
 
 @teacher_required

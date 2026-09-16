@@ -29,15 +29,11 @@ def calculate_grade(total_score):
     else:
         return 'F'
     
-def compute_positions(class_arm, subject):
-    students_results = Result.objects.filter(class_arm=class_arm, subject=subject).annotate(grand_total=Sum('total_score')).order_by('-grand_total')
-    position = 1
-
-    for entry in students_results:
-        student_id = entry.student.id
-        
-    Result.objects.filter(student_id=student_id, subject=subject, class_arm=class_arm).update(position=position)
-    position += 1
+def compute_positions(class_arm, subject, term):
+    results = Result.objects.filter(class_arm=class_arm, subject=subject, term=term).order_by('-total_score')
+    for position, result in enumerate(results, start=1):
+        result.position = position
+        result.save()
 
 def generate_comment(average):
     if average >= 90:

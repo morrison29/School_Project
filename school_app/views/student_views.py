@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from school_app.models import StudentProfile, TeacherProfile, Result, ClassArm
+from school_app.models import StudentProfile, TeacherProfile, Result, ClassArm, MidtermAssignment
 from school_app.decorators import student_required
 
 
@@ -10,10 +10,13 @@ def student_dashboard(request):
     student = get_object_or_404(StudentProfile, user=request.user)
     class_arm = student.class_arm
     teacher = TeacherProfile.objects.filter(class_arm=class_arm).first() if class_arm else None
+    results_count = Result.objects.filter(student=student).count()
+    assignments_count = MidtermAssignment.objects.filter(class_arm=class_arm).count() if class_arm else 0
     return render(request, 'school/student_dashboard.html', {
         'student': student,
         'class_arm': class_arm,
         'teacher': teacher,
+        'assignments_count': assignments_count,
     })
 
 

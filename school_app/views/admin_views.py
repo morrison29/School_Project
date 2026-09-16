@@ -50,11 +50,17 @@ def start_new_term(request):
             return redirect('school_app:start_new_term')
 
         session, _ = AcademicSession.objects.get_or_create(name=session_name)
+
+        term, _ = Term.objects.get_or_create(session=session, name=term_name)
+
+        if term.is_current and session.is_current:
+            messages.info(request, f"{term} is already the active term — nothing changed.")
+            return redirect('school_app:admin-dashboard')
+
         AcademicSession.objects.exclude(id=session.id).update(is_current=False)
         session.is_current = True
         session.save()
 
-        term, _ = Term.objects.get_or_create(session=session, name=term_name)
         Term.objects.exclude(id=term.id).update(is_current=False)
         term.is_current = True
         term.save()

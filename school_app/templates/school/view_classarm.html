@@ -13,7 +13,7 @@
   </div>
   {% if request.user.is_superuser %}
   <div class="actions">
-    <a href="{% url 'school_app:assign_teacher_class' %}" class="btn btn-outline">Assign Teacher</a>
+    <a href="{% url 'school_app:assign_teacher_class' %}?class_arm_id={{ class_arms.id }}" class="btn btn-outline">Assign Teacher</a>
     <a href="{% url 'school_app:assign_class_subject' %}" class="btn btn-outline">Assign Subjects</a>
     <form method="post" action="{% url 'school_app:promote_student' class_arms.id %}" onsubmit="return confirm('This will unassign all students from {{ class_arms.name }}. Continue?')">
       {% csrf_token %}
@@ -47,7 +47,7 @@
       <div class="empty-state" style="padding:24px;">
         <p>No teacher assigned.</p>
         {% if request.user.is_superuser %}
-        <a href="{% url 'school_app:assign_teacher_class' %}" class="btn btn-outline btn-sm" style="margin-top:10px;">Assign Teacher</a>
+        <a href="{% url 'school_app:assign_teacher_class' %}?class_arm_id={{ class_arms.id }}" class="btn btn-outline btn-sm" style="margin-top:10px;">Assign Teacher</a>
         {% endif %}
       </div>
       {% endif %}
@@ -76,7 +76,7 @@
   <div class="card-header">
     <span class="card-title">🎒 Students ({{ students.count }})</span>
     {% if request.user.is_superuser %}
-    <a href="{% url 'school_app:assign_student_class' %}" class="btn btn-outline btn-sm">Assign Student</a>
+    <a href="{% url 'school_app:assign_student_class' %}?class_arm_id={{ class_arms.id }}" class="btn btn-outline btn-sm">Assign Student</a>
     {% endif %}
   </div>
   {% if students %}

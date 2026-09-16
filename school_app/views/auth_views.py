@@ -40,7 +40,7 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     messages.success(request, "Logged out successfully.")
-    return redirect('school_app:home')
+    return redirect('school_app:login')
 
 
 @admin_required

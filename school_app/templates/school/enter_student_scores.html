@@ -102,9 +102,9 @@
             <td style="text-align:center;">
               {% for sid, res in existing.items %}
                 {% if sid == subject.id %}
-                  {% if res.position == 1 %}🥇
-                  {% elif res.position == 2 %}🥈
-                  {% elif res.position == 3 %}🥉
+                  {% if res.position == 1 %} 1st
+                  {% elif res.position == 2 %} 2nd
+                  {% elif res.position == 3 %} 3rd
                   {% else %}<span style="color:var(--muted);">{{ res.position }}th</span>
                   {% endif %}
                 {% endif %}

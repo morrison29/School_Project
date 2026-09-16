@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.core.validators import FileExtensionValidator
 # Create your models here.
 
 class AdminProfile(models.Model):
@@ -103,6 +104,13 @@ class MidtermAssignment(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     class_arm = models.ForeignKey(ClassArm, on_delete=models.CASCADE)
     due_date = models.DateField()
+    attachment = models.FileField(
+        upload_to='assignments/%Y/%m/',
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'doc', 'docx'])],
+        help_text="Optional. PDF or Word document, up to 10MB.",
+    )
    
 
     def __str__(self):

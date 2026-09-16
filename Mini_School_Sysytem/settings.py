@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'school_app',
 ]
 
@@ -137,7 +138,20 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # WhiteNoise: compressed + hashed filenames, served directly by gunicorn — no separate static file host needed
 STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
+# User-uploaded files (assignment attachments, etc.)
+# NOTE: this is local-disk storage. It works fine for local development, but
+# Render's free-tier web service disk is ephemeral and cannot take a persistent
+# disk add-on — anything written here is wiped on every deploy/restart, and
+# won't even be servable in production since DEBUG=False disables Django's
+# built-in file server. Before relying on this for real, switch to cloud
+# storage (e.g. django-storages + S3, or Cloudinary's free tier).
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'

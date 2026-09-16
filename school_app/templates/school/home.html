@@ -76,7 +76,16 @@
       border-right: 1px solid #E2E8F0;
     }
     .stat-item:last-child { border-right: none; }
-    .stat-item .num { font-size: 28px; font-weight: 800; color: var(--navy); }
+    .stat-item .num {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
     .stat-item .lbl { font-size: 12px; color: var(--muted); font-weight: 500; margin-top: 2px; }
 
     /* Features */
@@ -100,18 +109,28 @@
     .roles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
     .role-card {
       border-radius: 10px; padding: 28px 24px;
-      text-decoration: none; color: var(--text);
+      color: var(--text);
       border: 1px solid #E2E8F0;
-      transition: transform .15s, box-shadow .15s;
     }
-    .role-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.10); }
     .role-card.admin   { background: linear-gradient(135deg, #EBF2F9, #fff); border-color: #BFD7EF; }
     .role-card.teacher { background: linear-gradient(135deg, #EBF5F0, #fff); border-color: #B2DFC4; }
     .role-card.student { background: linear-gradient(135deg, #F3F0FF, #fff); border-color: #C9BFEF; }
     .role-icon { font-size: 36px; margin-bottom: 12px; }
     .role-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
-    .role-card p { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 16px; }
-    .role-link { font-size: 13px; font-weight: 600; color: var(--navy); display: flex; align-items: center; gap: 4px; }
+    .role-card p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    .role-tag {
+      display: inline-block;
+      margin-top: 14px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: rgba(255,255,255,.6);
+      border: 1px solid rgba(0,0,0,.06);
+      border-radius: 20px;
+      padding: 4px 12px;
+    }
 
     footer {
       background: var(--navy);
@@ -135,9 +154,6 @@
       <div class="brand-icon">🎓</div>
       <span>EduManage</span>
     </a>
-    <div class="header-cta">
-      <a href="{% url 'school_app:login' %}" class="btn btn-outline-white">Sign In</a>
-    </div>
   </header>
 
   <section class="hero">
@@ -149,12 +165,7 @@
     </div>
   </section>
 
-  <div class="stats-bar">
-    <div class="stat-item"><div class="num">3</div><div class="lbl">User Roles</div></div>
-    <div class="stat-item"><div class="num">∞</div><div class="lbl">Class Arms</div></div>
-    <div class="stat-item"><div class="num">OTP</div><div class="lbl">Verified Accounts</div></div>
-    <div class="stat-item"><div class="num">Live</div><div class="lbl">Score Computation</div></div>
-  </div>
+
 
   <div class="section">
     <div class="section-label">Features</div>
@@ -167,9 +178,9 @@
         <p>Admins, Teachers, and Students each get a dashboard scoped to their own class and permissions — teachers only ever see their own class arm's students and subjects.</p>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">✉️</div>
-        <h3>Email Verification</h3>
-        <p>New teacher and student accounts are activated by an email OTP before they can log in, keeping the register clean.</p>
+        <div class="feature-icon">🗝️</div>
+        <h3>Admin-Provisioned Accounts</h3>
+        <p>Admins create teacher and student logins directly with a username and password — no public sign-up, so the roster stays controlled.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon">📊</div>
@@ -214,19 +225,19 @@
           <div class="role-icon">🛡️</div>
           <h3>Administrator</h3>
           <p>Register teachers and students, create class arms, assign teachers/subjects/students to classes, review results school-wide, and start new terms.</p>
-          <div class="role-link">Sign in as Admin →</div>
+          <div class="role-tag">Admin Access</div>
         </div>
         <div class="role-card teacher">
           <div class="role-icon">👨‍🏫</div>
           <h3>Teacher</h3>
           <p>See your own class arm's students and subjects, create midterm assignments, and enter scores for your students.</p>
-          <div class="role-link">Sign in as Teacher →</div>
+          <div class="role-tag">Teacher Access</div>
         </div>
         <div class="role-card student">
           <div class="role-icon">🎒</div>
           <h3>Student</h3>
           <p>View your subjects and assignments, check your results and class position, and download your result slip as a PDF.</p>
-          <div class="role-link">Sign in as Student →</div>
+          <div class="role-tag">Student Access</div>
         </div>
       </div>
     </div>

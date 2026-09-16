@@ -8,19 +8,26 @@
 {% block content %}
 <div class="page-header">
   <div>
-    <h1>📝 {{ assignment.subject.subject_name }} — Assignment</h1>
-    <p>{{ assignment.class_arm.name }} &nbsp;·&nbsp; Due: <strong>{{ assignment.due_date }}</strong></p>
+    <h1>📝 {{ assignment.title|default:assignment.subject.subject_name }}</h1>
+    <p>{{ assignment.subject.subject_name }} &nbsp;·&nbsp; {{ assignment.class_arm.name }} &nbsp;·&nbsp; Due: <strong>{{ assignment.due_date }}</strong></p>
   </div>
   <a href="{% url 'school_app:view_midterm_assignment' assignment.class_arm.id %}" class="btn btn-outline">← Back to Assignments</a>
 </div>
 
 <div class="card card-form" style="max-width:720px;">
   <div class="card-header">
-    <span class="card-title">{{ assignment.subject.subject_name }}</span>
+    <span class="card-title">{{ assignment.title|default:assignment.subject.subject_name }}</span>
     <span class="badge badge-navy">Due: {{ assignment.due_date }}</span>
   </div>
   <div class="card-body">
     <div style="font-size:14px; line-height:1.8; white-space:pre-wrap; color:var(--text);">{{ assignment.description }}</div>
+
+    {% if assignment.attachment %}
+    <hr />
+    <a href="{{ assignment.attachment.url }}" target="_blank" rel="noopener" class="btn btn-outline" style="display:inline-flex;">
+      📎 {{ attachment_filename }}
+    </a>
+    {% endif %}
 
     {% if request.user|has_group:"Teachers" %}
     <hr />

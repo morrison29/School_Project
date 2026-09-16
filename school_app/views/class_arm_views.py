@@ -138,6 +138,8 @@ def assign_teacher_class_arm(request):
     return render(request, 'school/assign_teacher_class_arm.html', {
         'teachers': TeacherProfile.objects.all(),
         'class_arms': ClassArm.objects.all(),
+        'selected_teacher_id': request.GET.get('teacher_id', ''),
+        'selected_class_arm_id': request.GET.get('class_arm_id', ''),
     })
 
 
@@ -208,6 +210,8 @@ def assign_student_class_arm(request):
     return render(request, 'school/assign_student_class_arm.html', {
         'students': StudentProfile.objects.all(),
         'class_arms': ClassArm.objects.all(),
+        'selected_student_id': request.GET.get('student_id', ''),
+        'selected_class_arm_id': request.GET.get('class_arm_id', ''),
     })
 
 

@@ -1,4 +1,5 @@
 {% extends 'school/base.html' %}
+{% load humanize %}
 {% block title %}Student Results{% endblock %}
 {% block page_title %}Academic Results{% endblock %}
 {% block nav_admin_dash %}active{% endblock %}
@@ -37,6 +38,36 @@
 </div>
 {% endif %}
 
+<!-- Summary info card -->
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-body" style="padding:20px;">
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:16px;">
+      <div>
+        <div style="font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Name</div>
+        <div style="font-size:16px; font-weight:700;">{{ student.user.get_full_name }}</div>
+      </div>
+      <div>
+        <div style="font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Class</div>
+        <div style="font-size:16px; font-weight:700;">{{ student.class_arm.name|default:"—" }}</div>
+      </div>
+      <div>
+        <div style="font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Average</div>
+        <div style="font-size:16px; font-weight:700;">{{ overall_average }}</div>
+      </div>
+      <div>
+        <div style="font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Position in Class</div>
+        <div style="font-size:16px; font-weight:700;">
+          {% if class_position %}
+            {{ class_position|ordinal }}
+          {% else %}
+            —
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="card">
   <div class="card-header">
     <span class="card-title">Result Sheet</span>
@@ -68,8 +99,7 @@
             <span class="grade-{{ result.grade }}">{{ result.grade }}</span>
           </td>
           <td style="text-align:center;">
-            {% if result.position == 1 %}🥇{% elif result.position == 2 %}🥈{% elif result.position == 3 %}🥉{% endif %}
-            {{ result.position }}
+            {% if result.position %}{{ result.position|ordinal }}{% else %}—{% endif %}
           </td>
         </tr>
         {% endfor %}
