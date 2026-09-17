@@ -378,6 +378,16 @@
     .page-header h1 { font-size: 20px; font-weight: 700; }
     .page-header p  { font-size: 13px; color: var(--muted); margin-top: 2px; }
 
+    /* ── Page footer ── */
+    .app-footer {
+      margin-top: auto;
+      padding: 16px 28px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 16px;
+      background: var(--bg);
+    }
+
     /* ── Empty state ── */
     .empty-state {
       text-align: center;
@@ -623,6 +633,9 @@
 
       {% block content %}{% endblock %}
     </main>
+    <footer class="app-footer">
+      Endeavour to sign out after each session.
+    </footer>
   </div>
 </div>
 
