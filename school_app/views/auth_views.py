@@ -159,7 +159,7 @@ def register_student(request):
     return render(request, 'school/register_student.html')
 
  
-@admin_or_teacher_required
+@admin_required
 def assign_registration_number(request, student_id):
 
     student = get_object_or_404(StudentProfile, id=student_id)

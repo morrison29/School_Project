@@ -17,13 +17,12 @@ def create_midterm_assignment(request):
         return redirect('school_app:teacher-dashboard')
 
     if request.method == "POST":
-        title = request.POST.get('title', '').strip()
         description = request.POST.get('description', '').strip()
         subject_id = request.POST.get('subject')
         due_date = request.POST.get('due_date')
         attachment = request.FILES.get('attachment')
 
-        if not all([title, description, subject_id, due_date]):
+        if not all([description, subject_id, due_date]):
             messages.error(request, "All fields are required.")
             return redirect('school_app:create_midterm_assignment')
 
@@ -44,7 +43,6 @@ def create_midterm_assignment(request):
                 return redirect('school_app:create_midterm_assignment')
 
         MidtermAssignment.objects.create(
-            title=title,
             description=description,
             subject=subject,
             class_arm=class_arm,
@@ -121,4 +119,4 @@ def delete_midterm_assignment(request, assignment_id):
     # redirected to 'view_midterm_assignment' (singular) even though the
     # corresponding view function is named view_midterm_assignments
     # (plural). Keeping the original name here; rename if urls.py disagrees.
-    return redirect('school_app:view_midterm_assignments', class_arm_id=class_arm_id)
+    return redirect('school_app:view_midterm_assignment', class_arm_id=class_arm_id)

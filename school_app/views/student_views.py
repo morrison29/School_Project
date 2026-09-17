@@ -33,6 +33,7 @@ def edit_student_profile(request):
     if request.method == "POST":
         profile.address = request.POST.get('address', '')
         profile.phone_number = request.POST.get('phone_number', '')
+        profile.date_of_birth = request.POST.get('date_of_birth', None)
         profile.save()
 
         messages.success(request, "Profile updated successfully.")

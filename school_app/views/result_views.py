@@ -299,7 +299,7 @@ def enter_student_scores(request, student_id):
             compute_positions(class_arm, subject, current_term)
 
         messages.success(request, f"Scores saved for {student.user.get_full_name()}.")
-        return redirect('school_app:enter_scores', class_arm_id=class_arm.id)
+        return redirect('school_app:enter_student_scores', student_id=student.id)
 
     return render(request, 'school/enter_student_scores.html', {
         'student': student,
